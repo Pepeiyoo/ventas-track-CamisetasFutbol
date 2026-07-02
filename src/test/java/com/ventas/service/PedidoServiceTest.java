@@ -53,6 +53,7 @@ public class PedidoServiceTest {
             pedidoService.procesarYAsignar("PED-999", "AdministradorPepe");
         });
         
+        
         // 5. Verificamos que NUNCA se llegó a llamar al método .save() porque el proceso se cortó antes
         verify(repoMock, never()).save(any(Pedido.class));
     }
