@@ -26,6 +26,11 @@ public class Pedido {
         this.nombreAdministrador = nombreAdmin;
     }
 
+    // ➔ ¡AÑADE ESTE MÉTODO AQUÍ QUE FALTABA!
+    public String getId() {
+        return this.id;
+    }
+
     public EstadoPedido getEstado() { 
         return this.estado;
     }
