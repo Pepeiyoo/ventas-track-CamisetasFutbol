@@ -16,8 +16,10 @@ public class PedidoTest {
         });
         
         // 3. Verificamos que el estado NO haya cambiado a CERRADO por seguridad
+        // CORREGIDO: quitamos el 'get someEstado()' erróneo
         assertNotEquals(EstadoPedido.CERRADO, pedido.getEstado());
     }
+
     @Test
     public void testPermiteCerrarPedidoSiEstaEnProceso() {
         // 1. Creamos un pedido simulando que ya se está fabricando (EN_PROCESO)
