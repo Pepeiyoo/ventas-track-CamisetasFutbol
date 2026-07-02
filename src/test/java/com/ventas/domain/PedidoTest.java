@@ -14,7 +14,6 @@ public class PedidoTest {
         });
         assertNotEquals(EstadoPedido.CERRADO, pedido.getEstado());
     }
-
     
     @Test
     public void testPermiteCerrarPedidoSiEstaEnProceso() {
