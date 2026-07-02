@@ -37,4 +37,23 @@ public class PedidoServiceTest {
         // Verificamos que el servicio realmente llamó al método .save() para guardar los cambios
         verify(repoMock, times(1)).save(pedidoSimulado);
     }
+    @Test
+    public void testProcesarPedidoInexistenteLanzaExcepcion() {
+        // 1. Creamos el Mock del repositorio
+        PedidoRepository repoMock = mock(PedidoRepository.class);
+        
+        // 2. Simulamos que al buscar el ID "PED-999", el repositorio devuelve un Optional vacío (no existe)
+        when(repoMock.findById("PED-999")).thenReturn(Optional.empty());
+        
+        // 3. Instanciamos el servicio
+        PedidoService pedidoService = new PedidoService(repoMock);
+        
+        // 4. Verificamos que al llamar al método se lance la excepción esperada
+        assertThrows(IllegalArgumentException.class, () -> {
+            pedidoService.procesarYAsignar("PED-999", "AdministradorPepe");
+        });
+        
+        // 5. Verificamos que NUNCA se llegó a llamar al método .save() porque el proceso se cortó antes
+        verify(repoMock, never()).save(any(Pedido.class));
+    }
 }
