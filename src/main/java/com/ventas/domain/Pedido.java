@@ -31,6 +31,7 @@ public class Pedido {
         return this.id;
     }
 
+    
     public EstadoPedido getEstado() { 
         return this.estado;
     }
