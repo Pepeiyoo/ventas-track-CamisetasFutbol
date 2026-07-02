@@ -15,6 +15,7 @@ public class PedidoTest {
         assertNotEquals(EstadoPedido.CERRADO, pedido.getEstado());
     }
 
+    
     @Test
     public void testPermiteCerrarPedidoSiEstaEnProceso() {
         Pedido pedido = new Pedido("PED-101", EstadoPedido.EN_PROCESO);
