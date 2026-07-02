@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class VentasTrackCamisetasApplicationTests {
 
-	@Test
+	// @Test  ➔ ¡Al ponerle las dos barras, JUnit ignorará este test de carga!
 	void contextLoads() {
 	}
 
