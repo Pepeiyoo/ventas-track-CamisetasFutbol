@@ -1,5 +1,7 @@
 package com.ventas.domain;
 
-public class EstadoPedido {
-
+public enum EstadoPedido {
+    ABIERTO,
+    EN_PROCESO,
+    CERRADO
 }
