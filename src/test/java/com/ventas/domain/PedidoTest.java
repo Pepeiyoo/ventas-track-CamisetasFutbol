@@ -5,30 +5,37 @@ import org.junit.jupiter.api.Test;
 
 public class PedidoTest {
 
+    // === TESTS REGLA 1 ===
     @Test
     public void testNoSePuedeCerrarPedidoSiNoEstaEnProceso() {
-        // 1. Creamos un pedido de camisetas que nace ABIERTO
         Pedido pedido = new Pedido("PED-100", EstadoPedido.ABIERTO);
-        
-        // 2. Intentamos cerrarlo directamente (debería lanzar excepción porque no está EN_PROCESO)
         assertThrows(IllegalStateException.class, () -> {
             pedido.cerrar();
         });
-        
-        // 3. Verificamos que el estado NO haya cambiado a CERRADO por seguridad
-        // CORREGIDO: quitamos el 'get someEstado()' erróneo
         assertNotEquals(EstadoPedido.CERRADO, pedido.getEstado());
     }
 
     @Test
     public void testPermiteCerrarPedidoSiEstaEnProceso() {
-        // 1. Creamos un pedido simulando que ya se está fabricando (EN_PROCESO)
         Pedido pedido = new Pedido("PED-101", EstadoPedido.EN_PROCESO);
-        
-        // 2. Intentamos cerrarlo
         pedido.cerrar();
-        
-        // 3. Verificamos que ahora sí ha cambiado su estado a CERRADO
         assertEquals(EstadoPedido.CERRADO, pedido.getEstado());
+    }
+
+    // === TESTS REGLA 2 ===
+    @Test
+    public void testNoSePuedeAsignarAdministradorInactivo() {
+        Pedido pedido = new Pedido("PED-102", EstadoPedido.ABIERTO);
+        assertThrows(IllegalArgumentException.class, () -> {
+            pedido.asignarAdministrador("Pepe", false);
+        });
+        assertNull(pedido.getNombreAdministrador());
+    }
+
+    @Test
+    public void testPermiteAsignarAdministradorActivo() {
+        Pedido pedido = new Pedido("PED-103", EstadoPedido.ABIERTO);
+        pedido.asignarAdministrador("Pepe", true);
+        assertEquals("Pepe", pedido.getNombreAdministrador());
     }
 }
