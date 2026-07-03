@@ -10,6 +10,8 @@ public class Pedido {
     private String tipoCamiseta;   // "FAN" o "PLAYER"
     private boolean tieneNombreNumero;
     private boolean tieneParches;
+    public Pedido() {
+    }
 
     // 1. Constructor Completo (Para la API y Persistencia)
     public Pedido(String id, String estado, String nombreAdministrador, String modeloCamiseta, String tipoCamiseta, boolean tieneNombreNumero, boolean tieneParches) {
