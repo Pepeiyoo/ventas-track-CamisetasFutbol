@@ -2,10 +2,13 @@ package com.ventas.infrastructure.persistence;
 
 import com.ventas.domain.Pedido;
 import com.ventas.domain.PedidoRepository;
+
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
+@Primary
 public class JpaPedidoRepository implements PedidoRepository {
 
     private final SpringDataPedidoRepository springDataRepository;
