@@ -1,10 +1,12 @@
 package com.ventas.infrastructure.rest;
 
 import com.ventas.domain.Pedido;
+import com.ventas.domain.ItemPedido;
 import com.ventas.infrastructure.persistence.JpaPedidoRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/pedidos")
@@ -16,42 +18,47 @@ public class PedidoViewController {
         this.pedidoRepository = pedidoRepository;
     }
 
-    // 1. Muestra la página principal con el formulario y la tabla de pedidos
     @GetMapping
     public String verPaginaPedidos(Model model) {
-        // Pasamos la lista de pedidos calculados a la vista mediante DTOs
-        java.util.List<PedidoController.PedidoRespuestaDto> listaDtos = pedidoRepository.listarTodos().stream()
-                .map(PedidoController.PedidoRespuestaDto::new)
-                .collect(java.util.stream.Collectors.toList());
-        
-        model.addAttribute("pedidos", listaDtos);
-        return "pedidos"; // Esto buscará el archivo pedidos.html en templates
+        model.addAttribute("pedidos", pedidoRepository.listarTodos());
+        return "pedidos";
     }
 
-    // 2. Procesa el formulario web para crear un pedido sin escribir JSON
     @PostMapping("/nuevo")
     public String registrarPedidoDesdeForm(@RequestParam String id,
-                                           @RequestParam String modeloCamiseta,
                                            @RequestParam String nombreAdministrador,
+                                           @RequestParam String nombrePersona,
+                                           @RequestParam String modeloCamiseta,
+                                           @RequestParam String talla,
                                            @RequestParam String tipoCamiseta,
                                            @RequestParam(defaultValue = "false") boolean tieneNombreNumero,
-                                           @RequestParam(defaultValue = "false") boolean tieneParches) {
+                                           @RequestParam(defaultValue = "false") boolean tieneParches,
+                                           @RequestParam String urlFoto) {
         
-        Pedido nuevoPedido = new Pedido(id, "ABIERTO", nombreAdministrador, modeloCamiseta, tipoCamiseta, tieneNombreNumero, tieneParches);
-        pedidoRepository.guardar(nuevoPedido);
+        // Buscamos si ya existe el pedido grupal abierto
+        Optional<Pedido> pedidoExistente = pedidoRepository.buscarPorId(id);
+        Pedido pedido;
         
-        return "redirect:/pedidos"; // Recarga la página para mostrar el nuevo pedido en la tabla
+        if (pedidoExistente.isPresent()) {
+            pedido = pedidoExistente.get();
+        } else {
+            pedido = new Pedido(id, "ABIERTO", nombreAdministrador);
+        }
+
+        // Le añadimos la nueva persona con su camiseta al grupo
+        ItemPedido nuevoItem = new ItemPedido(nombrePersona, modeloCamiseta, talla, tipoCamiseta, tieneNombreNumero, tieneParches, urlFoto);
+        pedido.agregarItem(nuevoItem);
+        
+        pedidoRepository.guardar(pedido);
+        return "redirect:/pedidos";
     }
 
-    // 3. Botón rápido para finalizar o cambiar el estado desde la tabla
     @PostMapping("/{id}/finalizar")
     public String finalizarPedido(@PathVariable String id) {
-        java.util.Optional<Pedido> pedidoOpt = pedidoRepository.buscarPorId(id);
-        if (pedidoOpt.isPresent()) {
-            Pedido pedido = pedidoOpt.get();
-            pedido.setEstado("FINALIZADO");
-            pedidoRepository.guardar(pedido);
-        }
+        pedidoRepository.buscarPorId(id).ifPresent(p -> {
+            p.setEstado("FINALIZADO");
+            pedidoRepository.guardar(p);
+        });
         return "redirect:/pedidos";
     }
 }

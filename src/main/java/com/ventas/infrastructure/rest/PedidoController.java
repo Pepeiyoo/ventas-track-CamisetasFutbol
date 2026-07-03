@@ -1,12 +1,9 @@
 package com.ventas.infrastructure.rest;
 
-
-
 import com.ventas.domain.Pedido;
 import com.ventas.infrastructure.persistence.JpaPedidoRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,57 +18,38 @@ public class PedidoController {
         this.pedidoRepository = pedidoRepository;
     }
 
-    // 1. POST: Crear / Registrar Pedido
-    @PostMapping
-    public ResponseEntity<String> crearPedido(@RequestBody Pedido pedido) {
-        pedidoRepository.guardar(pedido);
-        return ResponseEntity.ok("Pedido registrado con éxito. ID: " + pedido.getId());
-    }
-
-    // 2. GET: Listar TODOS los pedidos con sus cálculos económicos
     @GetMapping
-    public ResponseEntity<List<PedidoRespuestaDto>> listarTodos() {
-        List<PedidoRespuestaDto> respuesta = pedidoRepository.listarTodos().stream()
+    public List<PedidoRespuestaDto> listarTodos() {
+        return pedidoRepository.listarTodos().stream()
                 .map(PedidoRespuestaDto::new)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(respuesta);
     }
 
-    // 3. GET: Ver un pedido por ID con sus cálculos
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoRespuestaDto> obtenerPorId(@PathVariable String id) {
+    public ResponseEntity<PedidoRespuestaDto> buscarPorId(@PathVariable String id) {
         Optional<Pedido> pedidoOpt = pedidoRepository.buscarPorId(id);
-        return pedidoOpt
-                .map(p -> ResponseEntity.ok(new PedidoRespuestaDto(p)))
+        return pedidoOpt.map(pedido -> ResponseEntity.ok(new PedidoRespuestaDto(pedido)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // 4. PUT: Gestionar / Actualizar Estado de un Pedido existente
     @PutMapping("/{id}/estado")
     public ResponseEntity<String> actualizarEstado(@PathVariable String id, @RequestParam String nuevoEstado) {
         Optional<Pedido> pedidoOpt = pedidoRepository.buscarPorId(id);
         if (pedidoOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        
         Pedido pedido = pedidoOpt.get();
-        pedido.setEstado(nuevoEstado); // Modificamos el estado
-        pedidoRepository.guardar(pedido); // Guardamos la actualización en BD
-        
+        pedido.setEstado(nuevoEstado);
+        pedidoRepository.guardar(pedido);
         return ResponseEntity.ok("El estado del pedido " + id + " ha sido actualizado a: " + nuevoEstado);
     }
 
-    // --- Clase interna DTO para mostrar los cálculos económicos en Swagger ---
+    // --- Clase interna DTO adaptada al nuevo modelo grupal financiero ---
     public static class PedidoRespuestaDto {
         public String id;
         public String estado;
         public String nombreAdministrador;
-        public String modeloCamiseta;
-        public String tipoCamiseta;
-        public boolean tieneNombreNumero;
-        public boolean tieneParches;
-        
-        // Campos económicos auto-calculados
+        public List<ItemDto> items;
         public double costeTotalFabricacion;
         public double precioVentaCliente;
         public double beneficioNeto;
@@ -80,13 +58,36 @@ public class PedidoController {
             this.id = p.getId();
             this.estado = p.getEstado();
             this.nombreAdministrador = p.getNombreAdministrador();
-            this.modeloCamiseta = p.getModeloCamiseta();
-            this.tipoCamiseta = p.getTipoCamiseta();
-            this.tieneNombreNumero = p.isTieneNombreNumero();
-            this.tieneParches = p.isTieneParches();
-            this.costeTotalFabricacion = p.calcularCoste();
-            this.precioVentaCliente = p.calcularPrecioVenta();
-            this.beneficioNeto = p.calcularBeneficio();
+            this.costeTotalFabricacion = p.getCosteTotalFabricacion();
+            this.precioVentaCliente = p.getPrecioVentaCliente();
+            this.beneficioNeto = p.getBeneficioNeto();
+            this.items = p.getItems().stream().map(ItemDto::new).collect(Collectors.toList());
+        }
+    }
+
+    public static class ItemDto {
+        public String nombrePersona;
+        public String modeloCamiseta;
+        public String talla;
+        public String tipoCamiseta;
+        public boolean tieneNombreNumero;
+        public boolean tieneParches;
+        public String urlFoto;
+        public double costeIndividual;
+        public double precioVentaIndividual;
+        public double beneficioIndividual;
+
+        public ItemDto(com.ventas.domain.ItemPedido item) {
+            this.nombrePersona = item.getNombrePersona();
+            this.modeloCamiseta = item.getModeloCamiseta();
+            this.talla = item.getTalla();
+            this.tipoCamiseta = item.getTipoCamiseta();
+            this.tieneNombreNumero = item.isTieneNombreNumero();
+            this.tieneParches = item.isTieneParches();
+            this.urlFoto = item.getUrlFoto();
+            this.costeIndividual = item.calcularCoste();
+            this.precioVentaIndividual = item.calcularPrecioVenta();
+            this.beneficioIndividual = item.calcularBeneficio();
         }
     }
 }

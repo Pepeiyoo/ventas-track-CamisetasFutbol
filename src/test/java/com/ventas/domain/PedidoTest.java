@@ -6,34 +6,26 @@ import org.junit.jupiter.api.Test;
 public class PedidoTest {
 
     @Test
-    public void testNoSePuedeCerrarPedidoSiNoEstaEnProceso() {
-        Pedido pedido = new Pedido("PED-100", EstadoPedido.ABIERTO);
-        assertThrows(IllegalStateException.class, () -> {
-            pedido.cerrar();
-        });
-        assertNotEquals("CERRADO", pedido.getEstado());
+    public void testAcumulacionFinancieraPedidoGrupal() {
+        Pedido pedido = new Pedido("GRUPO-JULIO", "ABIERTO", "Fornell");
+        
+        // Añadimos una Retro (Coste 11, Venta 25)
+        pedido.agregarItem(new ItemPedido("Persona1", "ManU Retro", "XL", "RETRO", false, false, ""));
+        // Añadimos una Fan sin extras (Coste 8, Venta 20)
+        pedido.agregarItem(new ItemPedido("Persona2", "Barca Fan", "S", "FAN", false, false, ""));
+        
+        // Totales: Coste = 11 + 8 = 19€ | Venta = 25 + 20 = 45€ | Beneficio = 45 - 19 = 26€
+        assertEquals(19.0, pedido.getCosteTotalFabricacion(), 0.01);
+        assertEquals(45.0, pedido.getPrecioVentaCliente(), 0.01);
+        assertEquals(26.0, pedido.getBeneficioNeto(), 0.01);
     }
 
     @Test
-    public void testPermiteCerrarPedidoSiEstaEnProceso() {
-        Pedido pedido = new Pedido("PED-101", EstadoPedido.EN_PROCESO);
-        pedido.cerrar();
-        assertEquals("CERRADO", pedido.getEstado());
-    }
-
-    @Test
-    public void testNoSePuedeAsignarAdministradorInactivo() {
-        Pedido pedido = new Pedido("PED-102", EstadoPedido.ABIERTO);
-        assertThrows(IllegalArgumentException.class, () -> {
-            pedido.asignarAdministrador("Pepe", false);
-        });
-        assertNull(pedido.getNombreAdministrador());
-    }
-
-    @Test
-    public void testPermiteAsignarAdministradorActivo() {
-        Pedido pedido = new Pedido("PED-103", EstadoPedido.ABIERTO);
-        pedido.asignarAdministrador("Pepe", true);
-        assertEquals("Pepe", pedido.getNombreAdministrador());
+    public void testCambioEstadoPedido() {
+        Pedido pedido = new Pedido("ID-01", "ABIERTO", "Admin");
+        assertEquals("ABIERTO", pedido.getEstado());
+        
+        pedido.setEstado("FINALIZADO");
+        assertEquals("FINALIZADO", pedido.getEstado());
     }
 }
