@@ -27,12 +27,11 @@ public class PedidoServiceIntegrationTest {
         
         Pedido recuperado = recuperadoOpt.get();
         assertEquals(2, recuperado.getItems().size());
-        
-        // Comprobación de finanzas conjuntas:
-        // Player con todo = 14€ coste, 22€ venta
-        // Niño = 11€ coste, 25€ venta fija
-        assertEquals(25.0, recuperado.getCosteTotalFabricacion()); // 14 + 11
-        assertEquals(47.0, recuperado.getPrecioVentaCliente());    // 22 + 25
-        assertEquals(22.0, recuperado.getBeneficioNeto());          // 47 - 25
+     // Comprobación de finanzas conjuntas actualizadas:
+     // Player con todo = 14€ coste, 22€ venta
+     // Niño base actualizado = 13€ coste, 25€ venta fija
+     assertEquals(27.0, recuperado.getCosteTotalFabricacion(), 0.01); // 14 + 13 = 27€
+     assertEquals(47.0, recuperado.getPrecioVentaCliente(), 0.01);    // 22 + 25 = 47€
+     assertEquals(20.0, recuperado.getBeneficioNeto(), 0.01);          // 47 - 27 = 20€
     }
 }

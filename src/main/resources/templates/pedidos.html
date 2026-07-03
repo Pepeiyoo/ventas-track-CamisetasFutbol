@@ -40,26 +40,26 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label small fw-semibold">Equipo / Modelo</label>
-                                <input type="text" name="modeloCamiseta" class="form-control form-control-sm" placeholder="Ej: Centenario Atlético de Madrid" required>
+                                <input type="text" name="modeloCamiseta" class="form-control form-control-sm" placeholder="Ej: Atlético de Madrid" required>
                             </div>
                             <div class="row">
                                 <div class="col-6 mb-3">
                                     <label class="form-label small fw-semibold">Talla</label>
-                                    <input type="text" name="talla" class="form-control form-control-sm" placeholder="Ej: M, L, XL, 10 años" required>
+                                    <input type="text" name="talla" class="form-control form-control-sm" placeholder="Ej: M" required>
                                 </div>
                                 <div class="col-6 mb-3">
                                     <label class="form-label small fw-semibold">Tipo</label>
                                     <select name="tipoCamiseta" class="form-select form-select-sm">
                                         <option value="FAN">Fan (8€ Base)</option>
                                         <option value="PLAYER">Player (11€ Base)</option>
-                                        <option value="RETRO">Retro (Tarifa 25€)</option>
-                                        <option value="NINO">Niño Kit (Tarifa 25€)</option>
+                                        <option value="RETRO">Retro (11€ Coste / 25€ Venta)</option>
+                                        <option value="NINO">Niño Kit (13€ Coste / 25€ Venta)</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label small fw-semibold">Enlace/URL Foto de la Camiseta</label>
-                                <input type="url" name="urlFoto" class="form-control form-control-sm" placeholder="http://imagen-de-google.com/foto.jpg">
+                                <input type="url" name="urlFoto" class="form-control form-control-sm" placeholder="https://url-de-la-foto.com/imagen.jpg">
                             </div>
 
                             <div class="form-check form-switch mb-2">
@@ -70,76 +70,85 @@
                                 <input class="form-check-input" type="checkbox" name="tieneParches" id="c2">
                                 <label class="form-check-label small" for="c2">Lleva Parches (+1€ si es Fan/Player)</label>
                             </div>
-                            <button type="submit" class="btn btn-success w-100 fw-bold">➕ Añadir al Pedido</button>
+                            <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm">➕ Añadir al Pedido</button>
                         </form>
                     </div>
                 </div>
             </div>
+			<div class="col-md-8">
+			                <div class="card shadow-sm border-0 mb-4" th:each="p : ${pedidos}">
+			                    <div class="card-header pedido-header d-flex justify-content-between align-items-center py-3">
+			                        <div>
+			                            <span class="badge bg-primary me-2" th:text="${p.id}">ID</span>
+			                            <span class="fw-bold text-dark" th:text="'Encargado: ' + ${p.nombreAdministrador}">Admin</span>
+			                            <span th:class="${p.estado == 'FINALIZADO'} ? 'ms-2 badge bg-success' : 'ms-2 badge bg-warning text-dark'" th:text="${p.estado}">Estado</span>
+			                        </div>
+			                        <div class="text-end">
+			                            <span class="small text-muted d-block">
+			                                Coste: <span th:text="${#numbers.formatDecimal(p.costeTotalFabricacion, 1, 2) + ' €'}"></span> | 
+			                                Venta: <span th:text="${#numbers.formatDecimal(p.precioVentaCliente, 1, 2) + ' €'}"></span>
+			                            </span>
+			                            <span class="fw-bold text-success">Beneficio Grupo: <span th:text="${#numbers.formatDecimal(p.beneficioNeto, 1, 2) + ' €'}"></span></span>
+			                        </div>
+			                    </div>
+			                    
+			                    <div class="card-body p-0">
+			                        <div class="table-responsive">
+			                            <table class="table table-hover align-middle mb-0">
+			                                <thead class="table-light table-sm">
+			                                    <tr>
+			                                        <th class="ps-3 text-center" style="width: 70px;">Foto</th>
+			                                        <th>Persona</th>
+			                                        <th>Modelo / Talla</th>
+			                                        <th>Tipo</th>
+			                                        <th>Coste</th>
+			                                        <th>P. Venta</th>
+			                                        <th class="text-success">Neto</th>
+			                                    </tr>
+			                                </thead>
+			                                <tbody>
+			                                    <tr th:each="item : ${p?.items}">
+			                                        <td class="ps-3 text-center">
+			                                            <img th:if="${item.urlFoto != null && item.urlFoto != ''}" th:src="${item.urlFoto}" class="img-camiseta" alt="Camiseta">
+			                                            <div th:unless="${item.urlFoto != null && item.urlFoto != ''}" class="bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center rounded mx-auto" style="width: 50px; height: 50px; border: 1px dashed #ccc;">
+			                                                 👕
+			                                            </div>
+			                                        </td>
+			                                        <td>
+			                                            <span class="fw-bold text-dark d-block" th:text="${item.nombrePersona}">Persona</span>
+			                                            <div class="mt-1">
+			                                                <span th:if="${item.tieneNombreNumero}" class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 small">Serigrafía</span>
+			                                                <span th:if="${item.tieneParches}" class="badge bg-purple bg-opacity-10 text-dark border small" style="background-color: #f1e4ff;">Parches</span>
+			                                            </div>
+			                                        </td>
+			                                        <td>
+			                                            <span class="d-block fw-semibold text-secondary" th:text="${item.modeloCamiseta}">Modelo</span>
+			                                            <small class="badge bg-dark bg-opacity-75" th:text="'Talla: ' + ${item.talla}"></small>
+			                                        </td>
+			                                        <td>
+			                                            <span th:class="${item.tipoCamiseta == 'RETRO' || item.tipoCamiseta == 'NINO'} ? 'badge bg-danger' : 'badge bg-dark'" th:text="${item.tipoCamiseta}">Tipo</span>
+			                                        </td>
+			                                        <td th:text="${#numbers.formatDecimal(item.costeIndividual, 1, 2) + ' €'}">0.00 €</td>
+			                                        <td th:text="${#numbers.formatDecimal(item.precioVentaIndividual, 1, 2) + ' €'}">0.00 €</td>
+			                                        <td class="text-success fw-bold" th:text="${#numbers.formatDecimal(item.beneficioIndividual, 1, 2) + ' €'}">0.00 €</td>
+			                                    </tr>
+			                                </tbody>
+			                            </table>
+			                        </div>
+			                    </div>
+			                    <div class="card-footer bg-white text-end py-2" th:if="${p.estado != 'FINALIZADO'}">
+			                        <form th:action="@{/pedidos/{id}/finalizar(id=${p.id})}" method="post">
+			                            <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">✅ Marcar Pedido Grupal como Completado</button>
+			                        </form>
+			                    </div>
+			                </div>
+			                
+			                <div th:if="${#lists.isEmpty(pedidos)}" class="alert alert-info text-center border-0 shadow-sm py-5">
+			                    👋 ¡Hola! No tienes ningún pedido en marcha todavía. Usa el formulario de la izquierda para registrar el primero.
+			                </div>
+			            </div>
+			        </div>
+			    </div>
 
-            <div class="col-md-8">
-                <div class="card shadow-sm border-0 mb-4" th:each="p : ${pedidos}">
-                    <div class="card-header pedido-header d-flex justify-content-between align-middle py-3">
-                        <div>
-                            <span class="badge bg-primary me-2" th:text="${p.id}">ID</span>
-                            <span class="fw-bold text-dark" th:text="'Encargado: ' + ${p.nombreAdministrador}">Admin</span>
-                            <span th:class="${p.estado == 'FINALIZADO'} ? 'ms-2 badge bg-success' : 'ms-2 badge bg-warning text-dark'" th:text="${p.estado}">Estado</span>
-                        </div>
-                        <div class="text-end">
-                            <span class="small text-muted d-block">Coste: <span th:text="${p.costeTotalFabricacion} + '€'"></span> | Venta: <span th:text="${p.precioVentaCliente} + '€'"></span></span>
-                            <span class="fw-bold text-success">Beneficio Grupo: <span th:text="${p.beneficioNeto} + '€'"></span></span>
-                        </div>
-                    </div>
-                    
-                    <div class="card-body p-0">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light table-sm">
-                                <tr>
-                                    <th class="ps-3">Foto</th>
-                                    <th>Persona</th>
-                                    <th>Modelo / Talla</th>
-                                    <th>Tipo</th>
-                                    <th>Coste</th>
-                                    <th>P. Venta</th>
-                                    <th class="text-success">Neto</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="item : ${p.items}">
-                                    <td class="ps-3">
-                                        <img th:src="${item.urlFoto}" class="img-camiseta" alt="Camiseta">
-                                    </td>
-                                    <td>
-                                        <span class="fw-bold text-secondary" th:text="${item.nombrePersona}">Persona</span>
-                                        <div class="small text-muted">
-                                            <span th:if="${item.tieneNombreNumero}" class="badge bg-light text-dark border">Serigrafía</span>
-                                            <span th:if="${item.tieneParches}" class="badge bg-light text-dark border">Parches</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="d-block fw-semibold text-dark" th:text="${item.modeloCamiseta}">Modelo</span>
-                                        <small class="badge bg-secondary" th:text="'Talla: ' + ${item.talla}"></small>
-                                    </td>
-                                    <td><span class="badge bg-dark" th:text="${item.tipoCamiseta}">Tipo</span></td>
-                                    <td th:text="${item.calcularCoste()} + ' €'">0 €</td>
-                                    <td th:text="${item.calcularPrecioVenta()} + ' €'">0 €</td>
-                                    <td class="text-success fw-bold" th:text="${item.calcularBeneficio()} + ' €'">0 €</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer bg-white text-end py-2" th:if="${p.estado != 'FINALIZADO'}">
-                        <form th:action="@{/pedidos/{id}/finalizar(id=${p.id})}" method="post">
-                            <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">✅ Marcar Pedido Grupal como Completado</button>
-                        </form>
-                    </div>
-                </div>
-                
-                <div th:if="${#lists.isEmpty(pedidos)}" class="alert alert-info text-center border-0 shadow-sm py-5">
-                    👋 ¡Hola! No tienes ningún pedido en marcha todavía. Usa el formulario de la izquierda para registrar el primero.
-                </div>
-            </div>
-        </div>
-    </div>
-
-</body>
-</html>
+			</body>
+			</html>

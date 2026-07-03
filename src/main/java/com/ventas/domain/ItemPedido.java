@@ -7,7 +7,7 @@ public class ItemPedido {
     private String tipoCamiseta; // "FAN", "PLAYER", "RETRO", "NINO"
     private boolean tieneNombreNumero;
     private boolean tieneParches;
-    private String urlFoto; // Para identificar el diseño visual
+    private String urlFoto;
 
     public ItemPedido() {}
 
@@ -18,26 +18,34 @@ public class ItemPedido {
         this.tipoCamiseta = tipoCamiseta;
         this.tieneNombreNumero = tieneNombreNumero;
         this.tieneParches = tieneParches;
-        this.urlFoto = (urlFoto == null || urlFoto.trim().isEmpty()) ? "https://placehold.co/60x60?text=Camiseta" : urlFoto;
+        // Si no ponen URL, dejamos el campo vacío para manejarlo con elegancia en el HTML
+        this.urlFoto = (urlFoto == null || urlFoto.trim().isEmpty()) ? "" : urlFoto.trim();
     }
 
-    // Lógica de costes según tus nuevas reglas
     public double calcularCoste() {
-        double costeBase = "FAN".equalsIgnoreCase(tipoCamiseta) ? 8.0 : 11.0; // Player, Retro y Niño cuestan 11€
-        if (tieneParches && !"RETRO".equalsIgnoreCase(tipoCamiseta) && !"NINO".equalsIgnoreCase(tipoCamiseta)) {
-            costeBase += 1.0;
+        if ("FAN".equalsIgnoreCase(tipoCamiseta)) {
+            double coste = 8.0;
+            if (tieneParches) coste += 1.0;
+            if (tieneNombreNumero) coste += 2.0;
+            return coste;
+        } else if ("PLAYER".equalsIgnoreCase(tipoCamiseta)) {
+            double coste = 11.0;
+            if (tieneParches) coste += 1.0;
+            if (tieneNombreNumero) coste += 2.0;
+            return coste;
+        } else if ("RETRO".equalsIgnoreCase(tipoCamiseta)) {
+            return 11.0; // Precio de coste fijo sin extras alterando el total
+        } else if ("NINO".equalsIgnoreCase(tipoCamiseta)) {
+            return 13.0; // ¡Actualizado! Tu nuevo precio de coste base para equipaciones completas
         }
-        if (tieneNombreNumero && !"RETRO".equalsIgnoreCase(tipoCamiseta) && !"NINO".equalsIgnoreCase(tipoCamiseta)) {
-            costeBase += 2.0;
-        }
-        return costeBase;
+        return 0.0;
     }
 
-    // Lógica de precios de venta fijos y variables
     public double calcularPrecioVenta() {
         if ("RETRO".equalsIgnoreCase(tipoCamiseta) || "NINO".equalsIgnoreCase(tipoCamiseta)) {
-            return 25.0; // Tus tarifas planas fijas
+            return 25.0; // Tarifa plana de venta que tú cobras
         }
+        // Para Fan y Player normales
         return tieneNombreNumero ? 22.0 : 20.0;
     }
 

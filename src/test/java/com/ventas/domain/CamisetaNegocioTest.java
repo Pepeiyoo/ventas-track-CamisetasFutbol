@@ -17,12 +17,12 @@ public class CamisetaNegocioTest {
 
     @Test
     public void testCalculoKitNinoTarifaPlana() {
-        // Los niños tienen coste base 11€ y precio venta fijo de 25€
+        // Los niños tienen coste base de 13€ y precio venta fijo de 25€
         ItemPedido itemNino = new ItemPedido("Lucas", "Real Madrid Niño", "8 años", "NINO", false, false, "");
         
-        assertEquals(11.0, itemNino.calcularCoste(), 0.01);
+        assertEquals(13.0, itemNino.calcularCoste(), 0.01);
         assertEquals(25.0, itemNino.calcularPrecioVenta(), 0.01);
-        assertEquals(14.0, itemNino.calcularBeneficio(), 0.01);
+        assertEquals(12.0, itemNino.calcularBeneficio(), 0.01);
     }
 
     @Test

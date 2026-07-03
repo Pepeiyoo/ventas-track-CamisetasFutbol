@@ -20,7 +20,12 @@ public class PedidoViewController {
 
     @GetMapping
     public String verPaginaPedidos(Model model) {
-        model.addAttribute("pedidos", pedidoRepository.listarTodos());
+        // Convertimos los pedidos a DTOs legibles para evitar que den valores nulos en Thymeleaf
+        java.util.List<PedidoController.PedidoRespuestaDto> listaDtos = pedidoRepository.listarTodos().stream()
+                .map(PedidoController.PedidoRespuestaDto::new)
+                .collect(java.util.stream.Collectors.toList());
+        
+        model.addAttribute("pedidos", listaDtos);
         return "pedidos";
     }
 

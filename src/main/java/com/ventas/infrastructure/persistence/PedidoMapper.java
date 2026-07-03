@@ -22,6 +22,7 @@ public class PedidoMapper {
         if (entity == null) return null;
         Pedido pedido = new Pedido(entity.getId(), entity.getEstado(), entity.getNombreAdministrador());
         
+        // Si la entidad de la BD tiene los ítems como null, evitamos que rompa el flujo
         if (entity.getItems() != null) {
             entity.getItems().forEach(i -> pedido.agregarItem(new ItemPedido(
                 i.getNombrePersona(), i.getModeloCamiseta(), i.getTalla(), i.getTipoCamiseta(),

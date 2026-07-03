@@ -44,6 +44,12 @@ public class Pedido {
     public void setEstado(String estado) { this.estado = estado; }
     public String getNombreAdministrador() { return nombreAdministrador; }
     public void setNombreAdministrador(String nombreAdministrador) { this.nombreAdministrador = nombreAdministrador; }
-    public List<ItemPedido> getItems() { return items; }
+ // Cambia el getter de los items en tu Pedido.java por este protegido:
+    public List<ItemPedido> getItems() {
+        if (this.items == null) {
+            this.items = new ArrayList<>();
+        }
+        return this.items;
+    }
     public void setItems(List<ItemPedido> items) { this.items = items; }
 }
