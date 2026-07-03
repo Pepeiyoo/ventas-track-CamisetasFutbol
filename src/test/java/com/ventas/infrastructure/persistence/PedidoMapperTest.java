@@ -1,13 +1,9 @@
 package com.ventas.infrastructure.persistence;
 
-
-
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import com.ventas.domain.Pedido;
-import com.ventas.infrastructure.persistence.PedidoEntity;
-import com.ventas.infrastructure.persistence.PedidoMapper;
 import com.ventas.domain.EstadoPedido;
+import com.ventas.domain.Pedido;
 
 public class PedidoMapperTest {
 
@@ -32,7 +28,7 @@ public class PedidoMapperTest {
 
         assertNotNull(pedido);
         assertEquals("PED-100", pedido.getId());
-        assertEquals(EstadoPedido.ABIERTO, pedido.getEstado());
+        assertEquals("ABIERTO", pedido.getEstado());
         assertEquals("CarlosAdmin", pedido.getNombreAdministrador());
     }
 }

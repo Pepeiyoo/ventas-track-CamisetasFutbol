@@ -32,4 +32,10 @@ public class JpaPedidoRepository implements PedidoRepository {
         return springDataRepository.findById(id)
                 .map(PedidoMapper::toDomain);
     }
+    public java.util.List<Pedido> listarTodos() {
+        return springDataRepository.findAll()
+                .stream()
+                .map(PedidoMapper::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }
