@@ -2,41 +2,77 @@ package com.ventas.domain;
 
 public class Pedido {
     private String id;
-    private EstadoPedido estado;
+    private String estado;
     private String nombreAdministrador;
+    
+    // Campos para la gestión económica de las camisetas
+    private String modeloCamiseta; 
+    private String tipoCamiseta;   // "FAN" o "PLAYER"
+    private boolean tieneNombreNumero;
+    private boolean tieneParches;
 
-    public Pedido(String id, EstadoPedido estado) {
+    // 1. Constructor Completo (Para la API y Persistencia)
+    public Pedido(String id, String estado, String nombreAdministrador, String modeloCamiseta, String tipoCamiseta, boolean tieneNombreNumero, boolean tieneParches) {
         this.id = id;
         this.estado = estado;
+        this.nombreAdministrador = nombreAdministrador;
+        this.modeloCamiseta = modeloCamiseta;
+        this.tipoCamiseta = tipoCamiseta;
+        this.tieneNombreNumero = tieneNombreNumero;
+        this.tieneParches = tieneParches;
     }
 
-    // Regla de Negocio 1: Cierre de Pedidos
+    // 2. Constructor Clave para tus Tests Universitarios (Ver imagen be1b06 y bf738b)
+    public Pedido(String id, EstadoPedido estadoEnum) {
+        this.id = id;
+        this.estado = estadoEnum.name();
+        this.modeloCamiseta = "Genérico";
+        this.tipoCamiseta = "FAN";
+    }
+
+    // --- Métodos de Lógica Económica ---
+    public double calcularCoste() {
+        double coste = 0.0;
+        if ("PLAYER".equalsIgnoreCase(this.tipoCamiseta)) {
+            coste += 11.0;
+        } else {
+            coste += 8.0;
+        }
+        if (this.tieneParches) coste += 1.0;
+        if (this.tieneNombreNumero) coste += 2.0;
+        return coste;
+    }
+
+    public double calcularPrecioVenta() {
+        return this.tieneNombreNumero ? 22.0 : 20.0;
+    }
+
+    public double calcularBeneficio() {
+        return calcularPrecioVenta() - calcularCoste();
+    }
+
+    // --- Métodos de Reglas que piden tus Tests (Ver imagen bf738b) ---
     public void cerrar() {
-        if (this.estado != EstadoPedido.EN_PROCESO) {
-            throw new IllegalStateException("No se puede cerrar un pedido que no esté EN_PROCESO");
+        if (!"EN_PROCESO".equals(this.estado)) {
+            throw new IllegalStateException("No se puede cerrar un pedido si no está en proceso");
         }
-        this.estado = EstadoPedido.CERRADO;
+        this.estado = "CERRADO";
     }
 
-    // Regla de Negocio 2: Validación de Administrador Activo (Fase GREEN)
-    public void asignarAdministrador(String nombreAdmin, boolean activo) {
-        if (!activo) {
-            throw new IllegalArgumentException("El administrador debe estar activo para gestionar el pedido");
+    public void asignarAdministrador(String nombre, boolean esActivo) {
+        if (!esActivo) {
+            throw new IllegalArgumentException("No se puede asignar un administrador inactivo");
         }
-        this.nombreAdministrador = nombreAdmin;
+        this.nombreAdministrador = nombre;
     }
 
-    // ➔ ¡AÑADE ESTE MÉTODO AQUÍ QUE FALTABA!
-    public String getId() {
-        return this.id;
-    }
-
-    
-    public EstadoPedido getEstado() { 
-        return this.estado;
-    }
-
-    public String getNombreAdministrador() {
-        return this.nombreAdministrador;
-    }
+    // --- Getters y Setters Estándar ---
+    public String getId() { return id; }
+    public String getEstado() { return estado; }
+    public String getNombreAdministrador() { return nombreAdministrador; }
+    public String getModeloCamiseta() { return modeloCamiseta; }
+    public String getTipoCamiseta() { return tipoCamiseta; }
+    public boolean isTieneNombreNumero() { return tieneNombreNumero; }
+    public boolean isTieneParches() { return tieneParches; }
+    public void setEstado(String estado) { this.estado = estado; }
 }

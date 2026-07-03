@@ -1,6 +1,5 @@
 package com.ventas.infrastructure.persistence;
 
-//Usamos anotaciones estándar de JPA para cuando metas Hibernate/Base de datos
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -9,28 +8,50 @@ import jakarta.persistence.Table;
 @Table(name = "pedidos")
 public class PedidoEntity {
 
- @Id
- private String id;
- private String estado;
- private String nombreAdministrador;
+    @Id
+    private String id;
+    private String estado;
+    private String nombreAdministrador;
+    private String modeloCamiseta;
+    private String tipoCamiseta;
+    private boolean tieneNombreNumero;
+    private boolean tieneParches;
 
- // Constructor vacío obligatorio para JPA
- public PedidoEntity() {
- }
+    public PedidoEntity() {}
 
- public PedidoEntity(String id, String estado, String nombreAdministrador) {
-     this.id = id;
-     this.estado = estado;
-     this.nombreAdministrador = nombreAdministrador;
- }
+    // Constructor completo para la base de datos
+    public PedidoEntity(String id, String estado, String nombreAdministrador, String modeloCamiseta, String tipoCamiseta, boolean tieneNombreNumero, boolean tieneParches) {
+        this.id = id;
+        this.estado = estado;
+        this.nombreAdministrador = nombreAdministrador;
+        this.modeloCamiseta = modeloCamiseta;
+        this.tipoCamiseta = tipoCamiseta;
+        this.tieneNombreNumero = tieneNombreNumero;
+        this.tieneParches = tieneParches;
+    }
 
- // Getters y Setters
- public String getId() { return id; }
- public void setId(String id) { this.id = id; }
+    // Constructor alternativo rápido para solucionar el test antiguo (Ver imagen bf73c6)
+    public PedidoEntity(String id, String estado, String nombreAdministrador) {
+        this.id = id;
+        this.estado = estado;
+        this.nombreAdministrador = nombreAdministrador;
+        this.modeloCamiseta = "Genérico";
+        this.tipoCamiseta = "FAN";
+    }
 
- public String getEstado() { return estado; }
- public void setEstado(String estado) { this.estado = estado; }
-
- public String getNombreAdministrador() { return nombreAdministrador; }
- public void setNombreAdministrador(String nombreAdministrador) { this.nombreAdministrador = nombreAdministrador; }
+    // Getters y Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+    public String getNombreAdministrador() { return nombreAdministrador; }
+    public void setNombreAdministrador(String nombreAdministrador) { this.nombreAdministrador = nombreAdministrador; }
+    public String getModeloCamiseta() { return modeloCamiseta; }
+    public void setModeloCamiseta(String modeloCamiseta) { this.modeloCamiseta = modeloCamiseta; }
+    public String getTipoCamiseta() { return tipoCamiseta; }
+    public void setTipoCamiseta(String tipoCamiseta) { this.tipoCamiseta = tipoCamiseta; }
+    public boolean isTieneNombreNumero() { return tieneNombreNumero; }
+    public void setTieneNombreNumero(boolean tieneNombreNumero) { this.tieneNombreNumero = tieneNombreNumero; }
+    public boolean isTieneParches() { return tieneParches; }
+    public void setTieneParches(boolean tieneParches) { this.tieneParches = tieneParches; }
 }

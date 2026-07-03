@@ -2,10 +2,13 @@ package com.ventas.infrastructure.persistence;
 
 import com.ventas.domain.Pedido;
 import com.ventas.domain.PedidoRepository;
+
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
+@Primary
 public class JpaPedidoRepository implements PedidoRepository {
 
     private final SpringDataPedidoRepository springDataRepository;
@@ -28,5 +31,11 @@ public class JpaPedidoRepository implements PedidoRepository {
         // Buscamos en la BD real y reconvertimos a objeto de dominio puro
         return springDataRepository.findById(id)
                 .map(PedidoMapper::toDomain);
+    }
+    public java.util.List<Pedido> listarTodos() {
+        return springDataRepository.findAll()
+                .stream()
+                .map(PedidoMapper::toDomain)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

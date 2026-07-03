@@ -5,29 +5,30 @@ import com.ventas.domain.Pedido;
 
 public class PedidoMapper {
 
-    // Convierte del Dominio puro a la entidad de Base de Datos
     public static PedidoEntity toEntity(Pedido pedido) {
         if (pedido == null) return null;
         return new PedidoEntity(
-            pedido.getId(), // ➔ Cambiado a getId() que es el estándar
-            pedido.getEstado().name(), 
-            pedido.getNombreAdministrador()
+            pedido.getId(),
+            pedido.getEstado(), // Arreglado: ya es String, no lleva .name()
+            pedido.getNombreAdministrador(),
+            pedido.getModeloCamiseta(),
+            pedido.getTipoCamiseta(),
+            pedido.isTieneNombreNumero(),
+            pedido.isTieneParches()
         );
     }
 
-    // Convierte de la entidad de Base de Datos al Dominio puro
     public static Pedido toDomain(PedidoEntity entity) {
         if (entity == null) return null;
         
-        EstadoPedido estado = EstadoPedido.valueOf(entity.getEstado());
-        
-        // Reconstruimos el objeto de dominio pasando el id y el estado
-        Pedido pedido = new Pedido(entity.getId(), estado); 
-        
-        if (entity.getNombreAdministrador() != null) {
-            pedido.asignarAdministrador(entity.getNombreAdministrador(), true);
-        }
-        
-        return pedido;
+        return new Pedido(
+            entity.getId(),
+            entity.getEstado(),
+            entity.getNombreAdministrador(),
+            entity.getModeloCamiseta(),
+            entity.getTipoCamiseta(),
+            entity.isTieneNombreNumero(),
+            entity.isTieneParches()
+        );
     }
 }
