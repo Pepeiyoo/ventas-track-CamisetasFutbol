@@ -45,6 +45,18 @@ public class ItemPedido {
         }
 
         return 22.00;
+
+        // RETRO y NINO tienen precio de venta fijo: los extras no alteran el PVP
+        if ("RETRO".equals(version) || "NINO".equals(version)) {
+            return 25.00;
+        }
+
+        // FAN y PLAYER: base 20€ + 2€ si lleva nombre/número
+        double precioBase = 20.00;
+        if (this.tieneNombreNumero) {
+            precioBase += 2.00; // +2.00 € Serigrafía
+        }
+        return precioBase;
     }
 
     public double calcularCoste() {
@@ -52,17 +64,20 @@ public class ItemPedido {
         
         String version = this.tipoCamiseta != null ? this.tipoCamiseta.toUpperCase() : "FAN";
         
-        if ("PLAYER".equals(version)) {
+        // RETRO y NINO tienen coste fijo: los extras no alteran el coste de fábrica
+        if ("RETRO".equals(version)) {
+            return 11.00;
+        } else if ("NINO".equals(version)) {
+            return 13.00;
+        } else if ("PLAYER".equals(version)) {
             costeBase = 11.00; // Coste de fábrica PLAYER
-        } else if ("RETRO".equals(version)) {
-            costeBase = 11.00; // Coste de fábrica RETRO
         }
         
         if (this.tieneNombreNumero) {
-            costeBase += 2.00; // +1.00 € de coste por estampar nombre
+            costeBase += 2.00; // +2.00 € de coste por estampar nombre
         }
         if (this.tieneParches) {
-            costeBase += 1.00; // 👈 +1.00 € al coste de fábrica por los parches
+            costeBase += 1.00; // +1.00 € al coste de fábrica por los parches
         }
         return costeBase;
     }
