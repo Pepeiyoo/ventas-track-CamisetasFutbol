@@ -36,27 +36,15 @@ public class ItemPedido {
     // Constructor vacío requerido por persistencia/mapeadores
     public ItemPedido() {}
 
-    // 🟢 1. CORRECCIÓN DE PRECIOS (FAN y PLAYER a 22€, RETRO a 25€)
+    // 🟢 1. CORRECCIÓN DE PRECIOS (FAN y PLAYER a 22€, RETRO y NINO a 25€)
     public double calcularPrecioVenta() {
         String version = this.tipoCamiseta != null ? this.tipoCamiseta.toUpperCase() : "FAN";
 
-        if ("RETRO".equals(version)) {
-            return 25.00;
-        }
-
-        return 22.00;
-
-        // RETRO y NINO tienen precio de venta fijo: los extras no alteran el PVP
         if ("RETRO".equals(version) || "NINO".equals(version)) {
             return 25.00;
         }
 
-        // FAN y PLAYER: base 20€ + 2€ si lleva nombre/número
-        double precioBase = 20.00;
-        if (this.tieneNombreNumero) {
-            precioBase += 2.00; // +2.00 € Serigrafía
-        }
-        return precioBase;
+        return 22.00;
     }
 
     public double calcularCoste() {
@@ -64,11 +52,11 @@ public class ItemPedido {
         
         String version = this.tipoCamiseta != null ? this.tipoCamiseta.toUpperCase() : "FAN";
         
-        // RETRO y NINO tienen coste fijo: los extras no alteran el coste de fábrica
+        // El PVP de RETRO y NINO es fijo, pero los extras (serigrafía, parches) sí afectan al coste
         if ("RETRO".equals(version)) {
-            return 11.00;
+            costeBase = 11.00;
         } else if ("NINO".equals(version)) {
-            return 13.00;
+            costeBase = 13.00;
         } else if ("PLAYER".equals(version)) {
             costeBase = 11.00; // Coste de fábrica PLAYER
         }
