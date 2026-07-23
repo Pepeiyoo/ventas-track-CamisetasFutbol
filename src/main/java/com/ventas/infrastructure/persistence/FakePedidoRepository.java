@@ -2,10 +2,15 @@ package com.ventas.infrastructure.persistence;
 
 import com.ventas.domain.Pedido;
 import com.ventas.domain.PedidoRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@Repository
 public class FakePedidoRepository implements PedidoRepository {
 
     // Simulamos la tabla de la base de datos con un mapa en memoria
@@ -30,5 +35,13 @@ public class FakePedidoRepository implements PedidoRepository {
         }
         // Convertimos la entidad de la "BD" de vuelta a objeto de Dominio puro
         return Optional.of(PedidoMapper.toDomain(entity));
+    }
+    
+    // 🔥 NUEVO: Método añadido para cumplir con la interfaz PedidoRepository
+    @Override
+    public List<Pedido> findAll() {
+        return tablaPedidos.values().stream()
+                .map(PedidoMapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

@@ -1,8 +1,8 @@
 package com.ventas.infrastructure.persistence;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pedidos")
@@ -12,31 +12,18 @@ public class PedidoEntity {
     private String id;
     private String estado;
     private String nombreAdministrador;
-    private String modeloCamiseta;
-    private String tipoCamiseta;
-    private boolean tieneNombreNumero;
-    private boolean tieneParches;
+
+    // Relación uno a muchos: Un pedido contiene muchas personas/camisetas
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "pedido_id")
+    private List<ItemPedidoEntity> items = new ArrayList<>();
 
     public PedidoEntity() {}
 
-    // Constructor completo para la base de datos
-    public PedidoEntity(String id, String estado, String nombreAdministrador, String modeloCamiseta, String tipoCamiseta, boolean tieneNombreNumero, boolean tieneParches) {
-        this.id = id;
-        this.estado = estado;
-        this.nombreAdministrador = nombreAdministrador;
-        this.modeloCamiseta = modeloCamiseta;
-        this.tipoCamiseta = tipoCamiseta;
-        this.tieneNombreNumero = tieneNombreNumero;
-        this.tieneParches = tieneParches;
-    }
-
-    // Constructor alternativo rápido para solucionar el test antiguo (Ver imagen bf73c6)
     public PedidoEntity(String id, String estado, String nombreAdministrador) {
         this.id = id;
         this.estado = estado;
         this.nombreAdministrador = nombreAdministrador;
-        this.modeloCamiseta = "Genérico";
-        this.tipoCamiseta = "FAN";
     }
 
     // Getters y Setters
@@ -46,12 +33,6 @@ public class PedidoEntity {
     public void setEstado(String estado) { this.estado = estado; }
     public String getNombreAdministrador() { return nombreAdministrador; }
     public void setNombreAdministrador(String nombreAdministrador) { this.nombreAdministrador = nombreAdministrador; }
-    public String getModeloCamiseta() { return modeloCamiseta; }
-    public void setModeloCamiseta(String modeloCamiseta) { this.modeloCamiseta = modeloCamiseta; }
-    public String getTipoCamiseta() { return tipoCamiseta; }
-    public void setTipoCamiseta(String tipoCamiseta) { this.tipoCamiseta = tipoCamiseta; }
-    public boolean isTieneNombreNumero() { return tieneNombreNumero; }
-    public void setTieneNombreNumero(boolean tieneNombreNumero) { this.tieneNombreNumero = tieneNombreNumero; }
-    public boolean isTieneParches() { return tieneParches; }
-    public void setTieneParches(boolean tieneParches) { this.tieneParches = tieneParches; }
+    public List<ItemPedidoEntity> getItems() { return items; }
+    public void setItems(List<ItemPedidoEntity> items) { this.items = items; }
 }

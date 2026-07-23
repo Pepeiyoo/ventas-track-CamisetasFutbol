@@ -1,78 +1,55 @@
 package com.ventas.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Pedido {
     private String id;
     private String estado;
-    private String nombreAdministrador;
-    
-    // Campos para la gestión económica de las camisetas
-    private String modeloCamiseta; 
-    private String tipoCamiseta;   // "FAN" o "PLAYER"
-    private boolean tieneNombreNumero;
-    private boolean tieneParches;
+    private String nombreAdministrador; // El que organiza el pedido grupal
+    private List<ItemPedido> items;
 
-    // 1. Constructor Completo (Para la API y Persistencia)
-    public Pedido(String id, String estado, String nombreAdministrador, String modeloCamiseta, String tipoCamiseta, boolean tieneNombreNumero, boolean tieneParches) {
+    public Pedido() {
+        this.items = new ArrayList<>();
+    }
+
+    public Pedido(String id, String estado, String nombreAdministrador) {
         this.id = id;
         this.estado = estado;
         this.nombreAdministrador = nombreAdministrador;
-        this.modeloCamiseta = modeloCamiseta;
-        this.tipoCamiseta = tipoCamiseta;
-        this.tieneNombreNumero = tieneNombreNumero;
-        this.tieneParches = tieneParches;
+        this.items = new ArrayList<>();
     }
 
-    // 2. Constructor Clave para tus Tests Universitarios (Ver imagen be1b06 y bf738b)
-    public Pedido(String id, EstadoPedido estadoEnum) {
-        this.id = id;
-        this.estado = estadoEnum.name();
-        this.modeloCamiseta = "Genérico";
-        this.tipoCamiseta = "FAN";
+    public void agregarItem(ItemPedido item) {
+        this.items.add(item);
     }
 
-    // --- Métodos de Lógica Económica ---
-    public double calcularCoste() {
-        double coste = 0.0;
-        if ("PLAYER".equalsIgnoreCase(this.tipoCamiseta)) {
-            coste += 11.0;
-        } else {
-            coste += 8.0;
-        }
-        if (this.tieneParches) coste += 1.0;
-        if (this.tieneNombreNumero) coste += 2.0;
-        return coste;
+    // --- Cálculos Financieros Grupales (Suman lo de cada persona) ---
+    public double getCosteTotalFabricacion() {
+        return items.stream().mapToDouble(ItemPedido::calcularCoste).sum();
     }
 
-    public double calcularPrecioVenta() {
-        return this.tieneNombreNumero ? 22.0 : 20.0;
+    public double getPrecioVentaCliente() {
+        return items.stream().mapToDouble(ItemPedido::calcularPrecioVenta).sum();
     }
 
-    public double calcularBeneficio() {
-        return calcularPrecioVenta() - calcularCoste();
+    public double getBeneficioNeto() {
+        return getPrecioVentaCliente() - getCosteTotalFabricacion();
     }
 
-    // --- Métodos de Reglas que piden tus Tests (Ver imagen bf738b) ---
-    public void cerrar() {
-        if (!"EN_PROCESO".equals(this.estado)) {
-            throw new IllegalStateException("No se puede cerrar un pedido si no está en proceso");
-        }
-        this.estado = "CERRADO";
-    }
-
-    public void asignarAdministrador(String nombre, boolean esActivo) {
-        if (!esActivo) {
-            throw new IllegalArgumentException("No se puede asignar un administrador inactivo");
-        }
-        this.nombreAdministrador = nombre;
-    }
-
-    // --- Getters y Setters Estándar ---
+    // Getters y Setters
     public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getEstado() { return estado; }
-    public String getNombreAdministrador() { return nombreAdministrador; }
-    public String getModeloCamiseta() { return modeloCamiseta; }
-    public String getTipoCamiseta() { return tipoCamiseta; }
-    public boolean isTieneNombreNumero() { return tieneNombreNumero; }
-    public boolean isTieneParches() { return tieneParches; }
     public void setEstado(String estado) { this.estado = estado; }
+    public String getNombreAdministrador() { return nombreAdministrador; }
+    public void setNombreAdministrador(String nombreAdministrador) { this.nombreAdministrador = nombreAdministrador; }
+ // Cambia el getter de los items en tu Pedido.java por este protegido:
+    public List<ItemPedido> getItems() {
+        if (this.items == null) {
+            this.items = new ArrayList<>();
+        }
+        return this.items;
+    }
+    public void setItems(List<ItemPedido> items) { this.items = items; }
 }
