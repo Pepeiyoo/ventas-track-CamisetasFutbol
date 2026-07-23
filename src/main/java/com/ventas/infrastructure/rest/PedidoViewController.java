@@ -34,7 +34,10 @@ public class PedidoViewController {
                                     @RequestParam String talla, @RequestParam String tipoCamiseta,
                                     @RequestParam(required = false) String urlFoto,
                                     @RequestParam(value = "tieneNombreNumero", required = false) Boolean tieneNombreNumero,
-                                    @RequestParam(value = "tieneParches", required = false) Boolean tieneParches) {
+                                    @RequestParam(value = "tieneParches", required = false) Boolean tieneParches,
+                                    @RequestParam(required = false) String nombreDorsal,
+                                    @RequestParam(required = false) String numeroDorsal,
+                                    @RequestParam(required = false) String tipoParche) {
         
         Pedido pedido = pedidoRepository.buscarPorId(id).orElseGet(() -> {
             Pedido nuevo = new Pedido();
@@ -47,6 +50,9 @@ public class PedidoViewController {
         ItemPedido nuevoItem = new ItemPedido(nombrePersona, modeloCamiseta, talla, tipoCamiseta, 
                                             (tieneNombreNumero != null && tieneNombreNumero), 
                                             (tieneParches != null && tieneParches), urlFoto);
+        nuevoItem.setNombreDorsal(nombreDorsal);
+        nuevoItem.setNumeroDorsal(numeroDorsal);
+        nuevoItem.setTipoParche(tipoParche);
         pedido.agregarItem(nuevoItem);
         pedidoRepository.guardar(pedido);
         return "redirect:/pedidos";
@@ -75,7 +81,10 @@ public class PedidoViewController {
                              @RequestParam String talla, @RequestParam String tipoCamiseta,
                              @RequestParam(required = false) String urlFoto,
                              @RequestParam(value = "tieneNombreNumero", required = false) Boolean tieneNombreNumero,
-                             @RequestParam(value = "tieneParches", required = false) Boolean tieneParches) {
+                             @RequestParam(value = "tieneParches", required = false) Boolean tieneParches,
+                             @RequestParam(required = false) String nombreDorsal,
+                             @RequestParam(required = false) String numeroDorsal,
+                             @RequestParam(required = false) String tipoParche) {
                            
         Pedido pedido = pedidoRepository.buscarPorId(pedidoId).orElseThrow();
 
@@ -90,6 +99,9 @@ public class PedidoViewController {
         item.setUrlFoto(urlFoto);
         item.setTieneNombreNumero(tieneNombreNumero != null && tieneNombreNumero);
         item.setTieneParches(tieneParches != null && tieneParches);
+        item.setNombreDorsal(nombreDorsal);
+        item.setNumeroDorsal(numeroDorsal);
+        item.setTipoParche(tipoParche);
 
         pedidoRepository.guardar(pedido);
         return "redirect:/pedidos";
@@ -98,8 +110,26 @@ public class PedidoViewController {
     @PostMapping("/{pedidoId:.+}/finalizar")
     public String finalizarPedido(@PathVariable String pedidoId) {
         Pedido pedido = pedidoRepository.buscarPorId(pedidoId).orElseThrow();
-        pedido.setEstado("CERRADO");
+        pedido.marcarCompletado();
         pedidoRepository.guardar(pedido);
+        return "redirect:/pedidos";
+    }
+
+    @PostMapping("/{pedidoId:.+}/reabrir")
+    public String reabrirPedido(@PathVariable String pedidoId) {
+        Pedido pedido = pedidoRepository.buscarPorId(pedidoId).orElseThrow();
+        pedido.deshacerCompletado();
+        pedidoRepository.guardar(pedido);
+        return "redirect:/pedidos";
+    }
+
+    @PostMapping("/{pedidoId:.+}/eliminar")
+    public String eliminarPedido(@PathVariable String pedidoId) {
+        Pedido pedido = pedidoRepository.buscarPorId(pedidoId).orElseThrow();
+        if (!pedido.sePuedeEliminar()) {
+            throw new IllegalStateException("Solo se pueden borrar pedidos cerrados/entregados.");
+        }
+        pedidoRepository.eliminarPorId(pedidoId);
         return "redirect:/pedidos";
     }
 

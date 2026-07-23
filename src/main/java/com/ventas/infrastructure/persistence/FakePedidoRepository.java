@@ -36,6 +36,11 @@ public class FakePedidoRepository implements PedidoRepository {
         // Convertimos la entidad de la "BD" de vuelta a objeto de Dominio puro
         return Optional.of(PedidoMapper.toDomain(entity));
     }
+
+    @Override
+    public void eliminarPorId(String id) {
+        tablaPedidos.remove(id);
+    }
     
     // 🔥 NUEVO: Método añadido para cumplir con la interfaz PedidoRepository
     @Override

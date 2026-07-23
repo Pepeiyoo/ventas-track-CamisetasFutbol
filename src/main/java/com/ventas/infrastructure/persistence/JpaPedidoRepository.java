@@ -35,6 +35,11 @@ public class JpaPedidoRepository implements PedidoRepository {
                 .map(PedidoMapper::toDomain);
     }
 
+    @Override
+    public void eliminarPorId(String id) {
+        springDataRepository.deleteById(id);
+    }
+
     // 🔥 CORREGIDO: Cambiado de listarTodos() a findAll() y añadido @Override
     @Override
     public List<Pedido> findAll() {

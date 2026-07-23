@@ -10,6 +10,9 @@ public class ItemPedido {
     private String tipoCamiseta; // "FAN", "PLAYER", "RETRO"
     private boolean tieneNombreNumero;
     private boolean tieneParches;
+    private String nombreDorsal;
+    private String numeroDorsal;
+    private String tipoParche;
     private String urlFoto;
     private boolean pagado; // Controla si está cobrado o pendiente
 
@@ -23,6 +26,9 @@ public class ItemPedido {
         this.tipoCamiseta = tipoCamiseta != null ? tipoCamiseta.toUpperCase() : "FAN";
         this.tieneNombreNumero = tieneNombreNumero;
         this.tieneParches = tieneParches;
+        this.nombreDorsal = "";
+        this.numeroDorsal = "";
+        this.tipoParche = "";
         this.urlFoto = urlFoto;
         this.pagado = false; // Por defecto nace sin pagar ("Cobro Pendiente")
     }
@@ -30,24 +36,15 @@ public class ItemPedido {
     // Constructor vacío requerido por persistencia/mapeadores
     public ItemPedido() {}
 
-    // 🟢 1. CORRECCIÓN DE PRECIOS (Regla de negocio: Base 20€ + 2€ Nombre/Número)
+    // 🟢 1. CORRECCIÓN DE PRECIOS (FAN y PLAYER a 22€, RETRO a 25€)
     public double calcularPrecioVenta() {
-        double precioBase = 22.00; // Por defecto FAN es 20.00€
-        
         String version = this.tipoCamiseta != null ? this.tipoCamiseta.toUpperCase() : "FAN";
-        
-        // Si es PLAYER o RETRO, el precio base incrementa para llegar a tus balances
-        if ("PLAYER".equals(version) || "RETRO".equals(version)) {
-            precioBase = 20.00; // 👈 Base de Player/Retro a 25.00€
+
+        if ("RETRO".equals(version)) {
+            return 25.00;
         }
 
-        if (this.tieneNombreNumero) {
-            precioBase += 2.00; // +2.00 € Serigrafía (20+2=22€ para FAN / 21+2=23€ para PLAYER)
-        }
-       // if (this.tieneParches) {
-         //   precioBase += 1.00; // +1.00 € Parches
-        //}
-        return precioBase;
+        return 22.00;
     }
 
     public double calcularCoste() {
@@ -79,6 +76,16 @@ public class ItemPedido {
         this.pagado = !this.pagado; // Si era falso pasa a verdadero, y viceversa
     }
 
+    private void limpiarPersonalizacionInactiva() {
+        if (!this.tieneNombreNumero) {
+            this.nombreDorsal = "";
+            this.numeroDorsal = "";
+        }
+        if (!this.tieneParches) {
+            this.tipoParche = "";
+        }
+    }
+
     // --- GETTERS Y SETTERS (Imprescindibles para que la foto y la vista funcionen) ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -96,10 +103,25 @@ public class ItemPedido {
     public void setTipoCamiseta(String tipoCamiseta) { this.tipoCamiseta = tipoCamiseta; }
 
     public boolean isTieneNombreNumero() { return tieneNombreNumero; }
-    public void setTieneNombreNumero(boolean tieneNombreNumero) { this.tieneNombreNumero = tieneNombreNumero; }
+    public void setTieneNombreNumero(boolean tieneNombreNumero) {
+        this.tieneNombreNumero = tieneNombreNumero;
+        limpiarPersonalizacionInactiva();
+    }
 
     public boolean isTieneParches() { return tieneParches; }
-    public void setTieneParches(boolean tieneParches) { this.tieneParches = tieneParches; }
+    public void setTieneParches(boolean tieneParches) {
+        this.tieneParches = tieneParches;
+        limpiarPersonalizacionInactiva();
+    }
+
+    public String getNombreDorsal() { return nombreDorsal; }
+    public void setNombreDorsal(String nombreDorsal) { this.nombreDorsal = nombreDorsal != null ? nombreDorsal.trim() : ""; }
+
+    public String getNumeroDorsal() { return numeroDorsal; }
+    public void setNumeroDorsal(String numeroDorsal) { this.numeroDorsal = numeroDorsal != null ? numeroDorsal.trim() : ""; }
+
+    public String getTipoParche() { return tipoParche; }
+    public void setTipoParche(String tipoParche) { this.tipoParche = tipoParche != null ? tipoParche.trim() : ""; }
 
     // El getter de la foto debe llamarse exactamente así para que Thymeleaf/HTML lo pinte
     public String getUrlFoto() { return urlFoto; } 

@@ -16,16 +16,25 @@ public class PedidoTest {
         
         // Totales: Coste = 11 + 8 = 19€ | Venta = 25 + 20 = 45€ | Beneficio = 45 - 19 = 26€
         assertEquals(19.0, pedido.getCosteTotalFabricacion(), 0.01);
-        assertEquals(45.0, pedido.getPrecioVentaCliente(), 0.01);
-        assertEquals(26.0, pedido.getBeneficioNeto(), 0.01);
+        assertEquals(47.0, pedido.getPrecioVentaCliente(), 0.01);
+        assertEquals(28.0, pedido.getBeneficioNeto(), 0.01);
     }
 
     @Test
     public void testCambioEstadoPedido() {
         Pedido pedido = new Pedido("ID-01", "ABIERTO", "Admin");
         assertEquals("ABIERTO", pedido.getEstado());
+        assertFalse(pedido.estaCompletado());
+        assertFalse(pedido.sePuedeEliminar());
         
-        pedido.setEstado("FINALIZADO");
-        assertEquals("FINALIZADO", pedido.getEstado());
+        pedido.marcarCompletado();
+        assertEquals("CERRADO", pedido.getEstado());
+        assertTrue(pedido.estaCompletado());
+        assertTrue(pedido.sePuedeEliminar());
+
+        pedido.deshacerCompletado();
+        assertEquals("ABIERTO", pedido.getEstado());
+        assertFalse(pedido.estaCompletado());
+        assertFalse(pedido.sePuedeEliminar());
     }
 }

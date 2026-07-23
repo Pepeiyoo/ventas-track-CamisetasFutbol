@@ -53,10 +53,9 @@
                                 <div class="col-6 mb-3">
                                     <label class="form-label small fw-semibold">Tipo</label>
                                     <select name="tipoCamiseta" class="form-select">
-                                        <option value="FAN">Fan (20€ Base)</option>
-                                        <option value="PLAYER">Player (21€ Base)</option>
-                                        <option value="RETRO">Retro (21€ Base)</option>
-                                        <option value="NINO">Niño Kit</option>
+                                        <option value="FAN">Fan (22€)</option>
+                                        <option value="PLAYER">Player (22€)</option>
+                                        <option value="RETRO">Retro (25€)</option>
                                     </select>
                                 </div>
                             </div>
@@ -66,11 +65,34 @@
                             </div>
                             <div class="form-check form-switch mb-2">
                                 <input class="form-check-input" type="checkbox" name="tieneNombreNumero" id="checkSerigrafia">
-                                <label class="form-check-label small" for="checkSerigrafia">Lleva Nombre/Número (+2€ si es Fan/Player)</label>
+                                <label class="form-check-label small" for="checkSerigrafia">Lleva Nombre/Número (opcional)</label>
                             </div>
                             <div class="form-check form-switch mb-4">
                                 <input class="form-check-input" type="checkbox" name="tieneParches" id="checkParches">
-                                <label class="form-check-label small" for="checkParches">Lleva Parches (+1€ si es Fan/Player)</label>
+                                <label class="form-check-label small" for="checkParches">Lleva Parches (opcional)</label>
+                            </div>
+                            <div id="bloquePersonalizacionAlta" class="border rounded p-3 mb-4" style="display:none;">
+                                <h6 class="text-secondary fw-bold mb-3">3. Personalizacion</h6>
+                                <div id="camposNombreNumeroAlta" style="display:none;">
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-semibold">Nombre dorsal</label>
+                                        <input type="text" name="nombreDorsal" class="form-control" maxlength="20" placeholder="Ej: MESSI">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Numero dorsal</label>
+                                        <input type="text" name="numeroDorsal" class="form-control" maxlength="3" placeholder="Ej: 10">
+                                    </div>
+                                </div>
+                                <div id="campoTipoParcheAlta" style="display:none;">
+                                    <label class="form-label small fw-semibold">Tipo de parche</label>
+                                    <select name="tipoParche" class="form-select">
+                                        <option value="">Selecciona un parche</option>
+                                        <option value="LALIGA">LaLiga</option>
+                                        <option value="CHAMPIONS">Champions</option>
+                                        <option value="MUNDIAL">Mundial de Clubes</option>
+                                        <option value="OTRO">Otro</option>
+                                    </select>
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">🛒 Guardar Pedido</button>
                         </form>
@@ -145,9 +167,15 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card-footer bg-white text-end py-3" th:if="${pedido.estado == 'ABIERTO'}">
-                            <form th:action="@{/pedidos/{id}/finalizar(id=${pedido.id})}" method="POST" style="display: inline;">
+                        <div class="card-footer bg-white text-end py-3">
+                            <form th:if="${pedido.estado == 'ABIERTO'}" th:action="@{/pedidos/{id}/finalizar(id=${pedido.id})}" method="POST" style="display: inline;">
                                 <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">✔️ Marcar Pedido Grupal como Completado</button>
+                            </form>
+                            <form th:if="${pedido.estado == 'CERRADO'}" th:action="@{/pedidos/{id}/reabrir(id=${pedido.id})}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-warning fw-bold">↩️ Deshacer completado</button>
+                            </form>
+                            <form th:if="${pedido.estado == 'CERRADO'}" th:action="@{/pedidos/{id}/eliminar(id=${pedido.id})}" method="POST" style="display: inline;" onsubmit="return confirm('¿Seguro que quieres borrar este pedido entregado? Esta accion no se puede deshacer.');">
+                                <button type="submit" class="btn btn-sm btn-danger fw-bold">🗑️ Borrar pedido entregado</button>
                             </form>
                         </div>
                     </div>
@@ -180,6 +208,18 @@
                                         <span th:if="${item.tieneParches}" class="badge badge-parches">Parches</span>
                                         <span th:if="${!item.tieneNombreNumero && !item.tieneParches}" class="text-muted small">Ninguna</span>
                                     </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between" th:if="${item.tieneNombreNumero}">
+                                    <span>Nombre dorsal:</span>
+                                    <strong th:text="${item.nombreDorsal != null && item.nombreDorsal != '' ? item.nombreDorsal : '-'}"></strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between" th:if="${item.tieneNombreNumero}">
+                                    <span>Numero dorsal:</span>
+                                    <strong th:text="${item.numeroDorsal != null && item.numeroDorsal != '' ? item.numeroDorsal : '-'}"></strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between" th:if="${item.tieneParches}">
+                                    <span>Tipo de parche:</span>
+                                    <strong th:text="${item.tipoParche != null && item.tipoParche != '' ? item.tipoParche : '-'}"></strong>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
                                     <span class="fw-bold text-secondary">Importe a pagar:</span>
@@ -226,10 +266,9 @@
                                     <div class="col-6 mb-3">
                                         <label class="form-label small fw-bold">Versión</label>
                                         <select name="tipoCamiseta" class="form-select">
-                                            <option value="FAN" th:selected="${item.tipoCamiseta == 'FAN'}">Fan Version</option>
-                                            <option value="PLAYER" th:selected="${item.tipoCamiseta == 'PLAYER'}">Player Version</option>
-                                            <option value="RETRO" th:selected="${item.tipoCamiseta == 'RETRO'}">Retro Version</option>
-                                            <option value="NINO" th:selected="${item.tipoCamiseta == 'NINO'}">Niño Kit</option>
+                                            <option value="FAN" th:selected="${item.tipoCamiseta == 'FAN'}">Fan Version (22€)</option>
+                                            <option value="PLAYER" th:selected="${item.tipoCamiseta == 'PLAYER'}">Player Version (22€)</option>
+                                            <option value="RETRO" th:selected="${item.tipoCamiseta == 'RETRO'}">Retro Version (25€)</option>
                                         </select>
                                     </div>
                                 </div>
@@ -239,11 +278,34 @@
                                 </div>
                                 <div class="form-check form-switch mb-2">
                                     <input class="form-check-input" type="checkbox" name="tieneNombreNumero" th:id="'editSerigrafia-' + ${item.id}" th:checked="${item.tieneNombreNumero}">
-                                    <label class="form-check-label small" th:for="'editSerigrafia-' + ${item.id}">Lleva Serigrafía (+2.00 €)</label>
+                                    <label class="form-check-label small" th:for="'editSerigrafia-' + ${item.id}">Lleva Nombre/Número (opcional)</label>
                                 </div>
                                 <div class="form-check form-switch mb-3">
                                     <input class="form-check-input" type="checkbox" name="tieneParches" th:id="'editParches-' + ${item.id}" th:checked="${item.tieneParches}">
-                                    <label class="form-check-label small" th:for="'editParches-' + ${item.id}">Lleva Parches de competición (+1.00 €)</label>
+                                    <label class="form-check-label small" th:for="'editParches-' + ${item.id}">Lleva Parches de competición (opcional)</label>
+                                </div>
+                                <div th:id="'editBloquePersonalizacion-' + ${item.id}" class="border rounded p-3 mb-3" th:style="${item.tieneNombreNumero || item.tieneParches} ? 'display:block;' : 'display:none;'">
+                                    <h6 class="text-secondary fw-bold mb-3">Personalizacion</h6>
+                                    <div th:id="'editCamposNombreNumero-' + ${item.id}" th:style="${item.tieneNombreNumero} ? 'display:block;' : 'display:none;'">
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-bold">Nombre dorsal</label>
+                                            <input type="text" name="nombreDorsal" class="form-control" maxlength="20" th:value="${item.nombreDorsal}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Numero dorsal</label>
+                                            <input type="text" name="numeroDorsal" class="form-control" maxlength="3" th:value="${item.numeroDorsal}">
+                                        </div>
+                                    </div>
+                                    <div th:id="'editCampoTipoParche-' + ${item.id}" th:style="${item.tieneParches} ? 'display:block;' : 'display:none;'">
+                                        <label class="form-label small fw-bold">Tipo de parche</label>
+                                        <select name="tipoParche" class="form-select">
+                                            <option value="" th:selected="${item.tipoParche == null || item.tipoParche == ''}">Selecciona un parche</option>
+                                            <option value="LALIGA" th:selected="${item.tipoParche == 'LALIGA'}">LaLiga</option>
+                                            <option value="CHAMPIONS" th:selected="${item.tipoParche == 'CHAMPIONS'}">Champions</option>
+                                            <option value="MUNDIAL" th:selected="${item.tipoParche == 'MUNDIAL'}">Mundial de Clubes</option>
+                                            <option value="OTRO" th:selected="${item.tipoParche == 'OTRO'}">Otro</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer bg-light">
@@ -257,6 +319,71 @@
         </div>
     </div>
 
+    <script>
+        (function () {
+            function toggleAltaPersonalizacion() {
+                const checkNombre = document.getElementById("checkSerigrafia");
+                const checkParches = document.getElementById("checkParches");
+                const bloque = document.getElementById("bloquePersonalizacionAlta");
+                const camposNombre = document.getElementById("camposNombreNumeroAlta");
+                const campoParche = document.getElementById("campoTipoParcheAlta");
+
+                if (!checkNombre || !checkParches || !bloque || !camposNombre || !campoParche) {
+                    return;
+                }
+
+                const activoNombre = checkNombre.checked;
+                const activoParches = checkParches.checked;
+
+                bloque.style.display = (activoNombre || activoParches) ? "block" : "none";
+                camposNombre.style.display = activoNombre ? "block" : "none";
+                campoParche.style.display = activoParches ? "block" : "none";
+            }
+
+            function toggleEdicionPersonalizacion(itemId) {
+                const checkNombre = document.getElementById("editSerigrafia-" + itemId);
+                const checkParches = document.getElementById("editParches-" + itemId);
+                const bloque = document.getElementById("editBloquePersonalizacion-" + itemId);
+                const camposNombre = document.getElementById("editCamposNombreNumero-" + itemId);
+                const campoParche = document.getElementById("editCampoTipoParche-" + itemId);
+
+                if (!checkNombre || !checkParches || !bloque || !camposNombre || !campoParche) {
+                    return;
+                }
+
+                const activoNombre = checkNombre.checked;
+                const activoParches = checkParches.checked;
+
+                bloque.style.display = (activoNombre || activoParches) ? "block" : "none";
+                camposNombre.style.display = activoNombre ? "block" : "none";
+                campoParche.style.display = activoParches ? "block" : "none";
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const altaNombre = document.getElementById("checkSerigrafia");
+                const altaParches = document.getElementById("checkParches");
+
+                if (altaNombre) {
+                    altaNombre.addEventListener("change", toggleAltaPersonalizacion);
+                }
+                if (altaParches) {
+                    altaParches.addEventListener("change", toggleAltaPersonalizacion);
+                }
+                toggleAltaPersonalizacion();
+
+                document.querySelectorAll("input[id^='editSerigrafia-']").forEach(function (input) {
+                    const itemId = input.id.substring("editSerigrafia-".length);
+                    const checkParches = document.getElementById("editParches-" + itemId);
+
+                    input.addEventListener("change", function () { toggleEdicionPersonalizacion(itemId); });
+                    if (checkParches) {
+                        checkParches.addEventListener("change", function () { toggleEdicionPersonalizacion(itemId); });
+                    }
+                    toggleEdicionPersonalizacion(itemId);
+                });
+            });
+        })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

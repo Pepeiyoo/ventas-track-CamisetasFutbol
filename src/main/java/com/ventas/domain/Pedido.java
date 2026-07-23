@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pedido {
+    private static final String ESTADO_ABIERTO = "ABIERTO";
+    private static final String ESTADO_COMPLETADO = "CERRADO";
+
     private String id;
     private String estado;
     private String nombreAdministrador; // El que organiza el pedido grupal
@@ -22,6 +25,22 @@ public class Pedido {
 
     public void agregarItem(ItemPedido item) {
         this.items.add(item);
+    }
+
+    public void marcarCompletado() {
+        this.estado = ESTADO_COMPLETADO;
+    }
+
+    public void deshacerCompletado() {
+        this.estado = ESTADO_ABIERTO;
+    }
+
+    public boolean estaCompletado() {
+        return ESTADO_COMPLETADO.equals(this.estado);
+    }
+
+    public boolean sePuedeEliminar() {
+        return estaCompletado();
     }
 
     // --- Cálculos Financieros Grupales (Suman lo de cada persona) ---
