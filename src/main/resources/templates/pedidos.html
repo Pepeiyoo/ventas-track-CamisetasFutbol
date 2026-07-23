@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Distribuidor de Camisetas VIP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .img-camiseta { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; }
+        .pedido-header { background-color: #f8f9fa; border-left: 5px solid #0d6efd; }
+        .fila-item { cursor: pointer; transition: background 0.2s; }
+        .fila-item:hover { background-color: rgba(13, 110, 253, 0.04) !important; }
+        .badge-serigrafia { background-color: #e0f2fe; color: #0369a1; font-weight: 600; }
+        .badge-parches { background-color: #f3e8ff; color: #6b21a8; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <div class="container my-5">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-primary">⚽ Distribuidor de Camisetas VIP</h1>
+            <p class="text-muted">Gestión de pedidos grupales, desglose por personas y balance financiero automático</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white fw-bold">🛒 Añadir Camiseta al Pedido</div>
+                    <div class="card-body">
+                        <form th:action="@{/pedidos/nuevo}" method="POST">
+                            <h6 class="text-secondary fw-bold border-bottom pb-1">1. Datos del Grupo</h6>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">ID del Pedido Grupal</label>
+                                <input type="text" name="id" class="form-control" placeholder="Ej: JULIO-01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Organizador / Administrador</label>
+                                <input type="text" name="nombreAdministrador" class="form-control" placeholder="Quién recoge el dinero" required>
+                            </div>
+                            <h6 class="text-secondary fw-bold border-bottom pt-2 pb-1">2. Detalles de la Persona</h6>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Nombre de la Persona</label>
+                                <input type="text" name="nombrePersona" class="form-control" placeholder="Ej: Pepe Martínez" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Equipo / Modelo</label>
+                                <input type="text" name="modeloCamiseta" class="form-control" placeholder="Ej: Atlético de Madrid" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label small fw-semibold">Talla</label>
+                                    <input type="text" name="talla" class="form-control" placeholder="Ej: M" required>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label small fw-semibold">Tipo</label>
+                                    <select name="tipoCamiseta" class="form-select">
+                                        <option value="FAN">Fan (20€ Base)</option>
+                                        <option value="PLAYER">Player (21€ Base)</option>
+                                        <option value="RETRO">Retro (21€ Base)</option>
+                                        <option value="NINO">Niño Kit</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Enlace/URL Foto de la Camiseta</label>
+                                <input type="url" name="urlFoto" class="form-control" placeholder="https://url-de-la-foto.com/imagen.jpg">
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="tieneNombreNumero" id="checkSerigrafia">
+                                <label class="form-check-label small" for="checkSerigrafia">Lleva Nombre/Número (+2€ si es Fan/Player)</label>
+                            </div>
+                            <div class="form-check form-switch mb-4">
+                                <input class="form-check-input" type="checkbox" name="tieneParches" id="checkParches">
+                                <label class="form-check-label small" for="checkParches">Lleva Parches (+1€ si es Fan/Player)</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">🛒 Guardar Pedido</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0 text-center p-5 text-muted" th:if="${#lists.isEmpty(pedidos)}">
+                    📋 <strong>Historial y Balance Financiero</strong>
+                    <p class="mt-3 mb-0">No hay pedidos registrados todavía. ¡Añade el primero!</p>
+                </div>
+                <div class="card shadow-sm border-0 mb-4" th:each="pedido : ${pedidos}">
+                    <div class="card-header pedido-header d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <span class="badge bg-primary me-2" th:text="${pedido.id}">Julio-26</span>
+                            <span class="fw-bold text-dark" th:text="'Encargado: ' + ${pedido.nombreAdministrador}">Pepe</span>
+                            <span th:class="${pedido.estado == 'ABIERTO'} ? 'badge bg-warning text-dark ms-2' : 'badge bg-secondary ms-2'" th:text="${pedido.estado}">ABIERTO</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="small text-muted d-block">
+                                Coste: <span th:text="${#numbers.formatDecimal(pedido.costeTotalFabricacion, 1, 2) + ' €'}"></span> | 
+                                Venta: <span th:text="${#numbers.formatDecimal(pedido.precioVentaCliente, 1, 2) + ' €'}"></span>
+                            </span>
+                            <span class="fw-bold text-success">Beneficio Grupo: <span th:text="${#numbers.formatDecimal(pedido.beneficioNeto, 1, 2) + ' €'}"></span></span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead class="table-light table-sm">
+                                    <tr>
+                                        <th class="ps-3" style="width: 75px;">Foto</th>
+                                        <th>Persona</th>
+                                        <th>Modelo / Talla</th>
+                                        <th>Tipo</th>
+                                        <th>Acción Pago</th>
+                                        <th>Coste</th>
+                                        <th>P. Venta</th>
+                                        <th class="text-success">Neto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="item : ${pedido.items}" class="fila-item">
+                                        <td class="ps-3" data-bs-toggle="modal" th:data-bs-target="'#modalVisor-' + ${item.id}">
+                                            <img th:if="${item.urlFoto != null && item.urlFoto != ''}" th:src="${item.urlFoto}" class="img-camiseta" alt="Camiseta">
+                                            <div th:unless="${item.urlFoto != null && item.urlFoto != ''}" class="bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center rounded" style="width: 50px; height: 50px; border: 1px dashed #ccc;">👕</div>
+                                        </td>
+                                        <td data-bs-toggle="modal" th:data-bs-target="'#modalVisor-' + ${item.id}">
+                                            <span class="fw-bold text-dark d-block" th:text="${item.nombrePersona}">Mario</span>
+                                            <div class="mt-1">
+                                                <span th:if="${item.tieneNombreNumero}" class="badge badge-serigrafia extra-small">Serigrafía</span>
+                                                <span th:if="${item.tieneParches}" class="badge badge-parches extra-small">Parches</span>
+                                            </div>
+                                        </td>
+                                        <td data-bs-toggle="modal" th:data-bs-target="'#modalVisor-' + ${item.id}">
+                                            <span class="d-block text-secondary" th:text="${item.modeloCamiseta}">Sevilla26/27</span>
+                                            <span class="badge bg-secondary" th:text="'Talla: ' + ${item.talla}">Talla: M</span>
+                                        </td>
+                                        <td data-bs-toggle="modal" th:data-bs-target="'#modalVisor-' + ${item.id}">
+                                            <span class="badge bg-dark" th:text="${item.tipoCamiseta}">PLAYER</span>
+                                        </td>
+                                        <td>
+                                            <form th:action="@{'/pedidos/' + ${pedido.id} + '/items/' + ${item.id} + '/alternar-pago'}" method="POST">
+                                                <button type="submit" th:class="${item.pagado} ? 'btn btn-sm btn-success fw-bold py-1' : 'btn btn-sm btn-outline-danger fw-bold py-1'" th:text="${item.pagado} ? '✅ Pagado' : '❌ Debe'"></button>
+                                            </form>
+                                        </td>
+                                        <td th:text="${#numbers.formatDecimal(item.costeIndividual, 1, 2) + ' €'}">0.00 €</td>
+                                        <td th:text="${#numbers.formatDecimal(item.precioVentaIndividual, 1, 2) + ' €'}">0.00 €</td>
+                                        <td class="text-success fw-bold" th:text="${#numbers.formatDecimal(item.beneficioIndividual, 1, 2) + ' €'}">0.00 €</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer bg-white text-end py-3" th:if="${pedido.estado == 'ABIERTO'}">
+                            <form th:action="@{/pedidos/{id}/finalizar(id=${pedido.id})}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">✔️ Marcar Pedido Grupal como Completado</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:each="pedido : ${pedidos}">
+        <div th:each="item : ${pedido.items}">
+            <div class="modal fade" th:id="'modalVisor-' + ${item.id}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title">📋 Ficha de Entrega</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img th:if="${item.urlFoto != null && item.urlFoto != ''}" th:src="${item.urlFoto}" class="img-fluid rounded mb-3 shadow-sm" style="max-height: 220px; object-fit: contain;" alt="Previsualización">
+                            <div th:unless="${item.urlFoto != null && item.urlFoto != ''}" class="bg-light rounded py-4 mb-3 border text-muted">👕 Sin imagen disponible</div>
+                            <h3 class="fw-bold text-primary mb-0" th:text="${item.nombrePersona}">Nombre</h3>
+                            <p class="text-muted mb-3" th:text="'Grupo: ' + ${pedido.id}"></p>
+                            <ul class="list-group list-group-flush border-top border-bottom text-start mb-4">
+                                <li class="list-group-item d-flex justify-content-between"><span>Camiseta:</span> <strong th:text="${item.modeloCamiseta}"></strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Talla:</span> <strong th:text="${item.talla}"></strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Acabado:</span> <span class="badge bg-secondary" th:text="${item.tipoCamiseta}"></span></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Personalización:</span> 
+                                    <div>
+                                        <span th:if="${item.tieneNombreNumero}" class="badge badge-serigrafia">Serigrafía</span>
+                                        <span th:if="${item.tieneParches}" class="badge badge-parches">Parches</span>
+                                        <span th:if="${!item.tieneNombreNumero && !item.tieneParches}" class="text-muted small">Ninguna</span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                                    <span class="fw-bold text-secondary">Importe a pagar:</span>
+                                    <span class="fs-4 fw-bold text-dark" th:text="${#numbers.formatDecimal(item.precioVentaIndividual, 1, 2) + ' €'}">0.00 €</span>
+                                </li>
+                            </ul>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <form th:action="@{'/pedidos/' + ${pedido.id} + '/items/' + ${item.id} + '/alternar-pago'}" method="POST" style="display:inline;">
+                                    <button type="submit" th:class="${item.pagado} ? 'btn btn-success fw-bold' : 'btn btn-danger fw-bold'">
+                                        <span th:text="${item.pagado} ? '✅ TOTALMENTE PAGADO' : '⚠️ COBRO PENDIENTE'"></span>
+                                    </button>
+                                </form>
+                                <div>
+                                    <button type="button" class="btn btn-warning fw-bold me-2" data-bs-dismiss="modal" data-bs-toggle="modal" th:data-bs-target="'#modalEditar-' + ${item.id}">✏️ Editar Datos</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" th:id="'modalEditar-' + ${item.id}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header bg-warning text-dark fw-bold">
+                            <h5 class="modal-title">✏️ Modificar Registro de Camiseta</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form th:action="@{'/pedidos/' + ${pedido.id} + '/items/' + ${item.id} + '/editar'}" method="POST">
+                            <div class="modal-body text-start">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Nombre de la Persona</label>
+                                    <input type="text" name="nombrePersona" th:value="${item.nombrePersona}" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Modelo / Equipo</label>
+                                    <input type="text" name="modeloCamiseta" th:value="${item.modeloCamiseta}" class="form-control" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label class="form-label small fw-bold">Talla</label>
+                                        <input type="text" name="talla" th:value="${item.talla}" class="form-control" required>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label class="form-label small fw-bold">Versión</label>
+                                        <select name="tipoCamiseta" class="form-select">
+                                            <option value="FAN" th:selected="${item.tipoCamiseta == 'FAN'}">Fan Version</option>
+                                            <option value="PLAYER" th:selected="${item.tipoCamiseta == 'PLAYER'}">Player Version</option>
+                                            <option value="RETRO" th:selected="${item.tipoCamiseta == 'RETRO'}">Retro Version</option>
+                                            <option value="NINO" th:selected="${item.tipoCamiseta == 'NINO'}">Niño Kit</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">URL Imagen de la Camiseta</label>
+                                    <input type="url" name="urlFoto" th:value="${item.urlFoto}" class="form-control">
+                                </div>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" name="tieneNombreNumero" th:id="'editSerigrafia-' + ${item.id}" th:checked="${item.tieneNombreNumero}">
+                                    <label class="form-check-label small" th:for="'editSerigrafia-' + ${item.id}">Lleva Serigrafía (+2.00 €)</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="tieneParches" th:id="'editParches-' + ${item.id}" th:checked="${item.tieneParches}">
+                                    <label class="form-check-label small" th:for="'editParches-' + ${item.id}">Lleva Parches de competición (+1.00 €)</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success fw-bold">💾 Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -2,10 +2,12 @@ package com.ventas.infrastructure.persistence;
 
 import com.ventas.domain.Pedido;
 import com.ventas.domain.PedidoRepository;
-
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Primary
@@ -32,10 +34,13 @@ public class JpaPedidoRepository implements PedidoRepository {
         return springDataRepository.findById(id)
                 .map(PedidoMapper::toDomain);
     }
-    public java.util.List<Pedido> listarTodos() {
+
+    // 🔥 CORREGIDO: Cambiado de listarTodos() a findAll() y añadido @Override
+    @Override
+    public List<Pedido> findAll() {
         return springDataRepository.findAll()
                 .stream()
                 .map(PedidoMapper::toDomain)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 }
