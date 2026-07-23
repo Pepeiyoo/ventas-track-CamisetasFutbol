@@ -12,7 +12,8 @@ public class PedidoMapper {
         
         entity.setItems(pedido.getItems().stream().map(i -> new ItemPedidoEntity(
             i.getId(), i.getNombrePersona(), i.getModeloCamiseta(), i.getTalla(), i.getTipoCamiseta(),
-            i.isTieneNombreNumero(), i.isTieneParches(), i.getUrlFoto(), i.isPagado()
+            i.isTieneNombreNumero(), i.isTieneParches(), i.getNombreDorsal(), i.getNumeroDorsal(), i.getTipoParche(),
+            i.getUrlFoto(), i.isPagado()
         )).collect(Collectors.toList()));
         
         return entity;
@@ -34,6 +35,9 @@ public class PedidoMapper {
                 item.setTipoCamiseta(i.getTipoCamiseta());
                 item.setTieneNombreNumero(i.isTieneNombreNumero());
                 item.setTieneParches(i.isTieneParches());
+                item.setNombreDorsal(i.getNombreDorsal());
+                item.setNumeroDorsal(i.getNumeroDorsal());
+                item.setTipoParche(i.getTipoParche());
                 item.setUrlFoto(i.getUrlFoto());
                 item.setPagado(i.isPagado());
                 pedido.agregarItem(item);

@@ -18,7 +18,7 @@ public class PedidoServiceIntegrationTest {
     public void testGuardarYRecuperarPedidoGrupal() {
         Pedido pedidoOriginal = new Pedido("GRUPO-TEST", "ABIERTO", "Fornell");
         pedidoOriginal.agregarItem(new ItemPedido("Alex", "Milan", "M", "PLAYER", true, true, ""));
-        pedidoOriginal.agregarItem(new ItemPedido("Nene", "Barca", "8 años", "NINO", false, false, ""));
+        pedidoOriginal.agregarItem(new ItemPedido("Nene", "Barca Retro", "8 años", "RETRO", false, false, ""));
 
         pedidoRepository.guardar(pedidoOriginal);
 
@@ -29,9 +29,22 @@ public class PedidoServiceIntegrationTest {
         assertEquals(2, recuperado.getItems().size());
      // Comprobación de finanzas conjuntas actualizadas:
      // Player con todo = 14€ coste, 22€ venta
-     // Niño base actualizado = 13€ coste, 25€ venta fija
-     assertEquals(27.0, recuperado.getCosteTotalFabricacion(), 0.01); // 14 + 13 = 27€
+     // Retro base = 11€ coste, 25€ venta fija
+     assertEquals(25.0, recuperado.getCosteTotalFabricacion(), 0.01); // 14 + 11 = 25€
      assertEquals(47.0, recuperado.getPrecioVentaCliente(), 0.01);    // 22 + 25 = 47€
-     assertEquals(20.0, recuperado.getBeneficioNeto(), 0.01);          // 47 - 27 = 20€
+     assertEquals(22.0, recuperado.getBeneficioNeto(), 0.01);          // 47 - 25 = 22€
+    }
+
+    @Test
+    public void testEliminarPedidoPorId() {
+        Pedido pedido = new Pedido("GRUPO-BORRAR", "CERRADO", "Fornell");
+        pedido.agregarItem(new ItemPedido("Alex", "Milan", "M", "PLAYER", false, false, ""));
+        pedidoRepository.guardar(pedido);
+
+        assertTrue(pedidoRepository.buscarPorId("GRUPO-BORRAR").isPresent());
+
+        pedidoRepository.eliminarPorId("GRUPO-BORRAR");
+
+        assertFalse(pedidoRepository.buscarPorId("GRUPO-BORRAR").isPresent());
     }
 }

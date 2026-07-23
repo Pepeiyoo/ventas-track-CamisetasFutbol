@@ -43,6 +43,9 @@ public class PedidoController {
         public String tipoCamiseta;
         public boolean tieneNombreNumero;
         public boolean tieneParches;
+        public String nombreDorsal;
+        public String numeroDorsal;
+        public String tipoParche;
         public String urlFoto;
         public boolean pagado;
         public double costeIndividual;
@@ -57,6 +60,9 @@ public class PedidoController {
             this.tipoCamiseta = item.getTipoCamiseta();
             this.tieneNombreNumero = item.isTieneNombreNumero();
             this.tieneParches = item.isTieneParches();
+            this.nombreDorsal = item.getNombreDorsal();
+            this.numeroDorsal = item.getNumeroDorsal();
+            this.tipoParche = item.getTipoParche();
             this.urlFoto = item.getUrlFoto();
             this.pagado = item.isPagado();
             this.costeIndividual = item.calcularCoste();

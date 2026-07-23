@@ -19,6 +19,9 @@ public class ItemPedidoEntity {
     private String tipoCamiseta;
     private boolean tieneNombreNumero;
     private boolean tieneParches;
+    private String nombreDorsal;
+    private String numeroDorsal;
+    private String tipoParche;
     private String urlFoto;
     private boolean pagado;
 
@@ -26,6 +29,7 @@ public class ItemPedidoEntity {
 
     public ItemPedidoEntity(String itemId, String nombrePersona, String modeloCamiseta, String talla,
                             String tipoCamiseta, boolean tieneNombreNumero, boolean tieneParches,
+                            String nombreDorsal, String numeroDorsal, String tipoParche,
                             String urlFoto, boolean pagado) {
         this.itemId = itemId;
         this.nombrePersona = nombrePersona;
@@ -34,6 +38,9 @@ public class ItemPedidoEntity {
         this.tipoCamiseta = tipoCamiseta;
         this.tieneNombreNumero = tieneNombreNumero;
         this.tieneParches = tieneParches;
+        this.nombreDorsal = nombreDorsal;
+        this.numeroDorsal = numeroDorsal;
+        this.tipoParche = tipoParche;
         this.urlFoto = urlFoto;
         this.pagado = pagado;
     }
@@ -55,6 +62,12 @@ public class ItemPedidoEntity {
     public void setTieneNombreNumero(boolean tieneNombreNumero) { this.tieneNombreNumero = tieneNombreNumero; }
     public boolean isTieneParches() { return tieneParches; }
     public void setTieneParches(boolean tieneParches) { this.tieneParches = tieneParches; }
+    public String getNombreDorsal() { return nombreDorsal; }
+    public void setNombreDorsal(String nombreDorsal) { this.nombreDorsal = nombreDorsal; }
+    public String getNumeroDorsal() { return numeroDorsal; }
+    public void setNumeroDorsal(String numeroDorsal) { this.numeroDorsal = numeroDorsal; }
+    public String getTipoParche() { return tipoParche; }
+    public void setTipoParche(String tipoParche) { this.tipoParche = tipoParche; }
     public String getUrlFoto() { return urlFoto; }
     public void setUrlFoto(String urlFoto) { this.urlFoto = urlFoto; }
     public boolean isPagado() { return pagado; }
