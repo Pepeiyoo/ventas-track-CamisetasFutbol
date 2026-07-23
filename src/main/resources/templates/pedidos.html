@@ -238,12 +238,12 @@
                                     <input type="url" name="urlFoto" th:value="${item.urlFoto}" class="form-control">
                                 </div>
                                 <div class="form-check form-switch mb-2">
-                                    <input class="form-check-input" type="checkbox" name="tieneNombreNumero" id="editSerigrafia" th:checked="${item.tieneNombreNumero}">
-                                    <label class="form-check-label small" for="editSerigrafia">Lleva Serigrafía (+2.00 €)</label>
+                                    <input class="form-check-input" type="checkbox" name="tieneNombreNumero" th:id="'editSerigrafia-' + ${item.id}" th:checked="${item.tieneNombreNumero}">
+                                    <label class="form-check-label small" th:for="'editSerigrafia-' + ${item.id}">Lleva Serigrafía (+2.00 €)</label>
                                 </div>
                                 <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" name="tieneParches" id="editParches" th:checked="${item.tieneParches}">
-                                    <label class="form-check-label small" for="editParches">Lleva Parches de competición (+1.00 €)</label>
+                                    <input class="form-check-input" type="checkbox" name="tieneParches" th:id="'editParches-' + ${item.id}" th:checked="${item.tieneParches}">
+                                    <label class="form-check-label small" th:for="'editParches-' + ${item.id}">Lleva Parches de competición (+1.00 €)</label>
                                 </div>
                             </div>
                             <div class="modal-footer bg-light">

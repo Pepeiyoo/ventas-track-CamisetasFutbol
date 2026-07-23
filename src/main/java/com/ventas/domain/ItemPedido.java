@@ -32,13 +32,13 @@ public class ItemPedido {
 
     // 🟢 1. CORRECCIÓN DE PRECIOS (Regla de negocio: Base 20€ + 2€ Nombre/Número)
     public double calcularPrecioVenta() {
-        double precioBase = 20.00; // Por defecto FAN es 20.00€
+        double precioBase = 22.00; // Por defecto FAN es 20.00€
         
         String version = this.tipoCamiseta != null ? this.tipoCamiseta.toUpperCase() : "FAN";
         
         // Si es PLAYER o RETRO, el precio base incrementa para llegar a tus balances
         if ("PLAYER".equals(version) || "RETRO".equals(version)) {
-            precioBase = 20.00; // 👈 Base de Player/Retro a 21.00€
+            precioBase = 20.00; // 👈 Base de Player/Retro a 25.00€
         }
 
         if (this.tieneNombreNumero) {

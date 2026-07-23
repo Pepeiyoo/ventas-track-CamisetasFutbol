@@ -53,15 +53,22 @@ public class PedidoViewController {
     }
 
     // Ruta fija: /{pedidoId:.+}/items/{itemId}/alternar-pago
+ // 1. Alternar Pago con String itemId
     @PostMapping("/{pedidoId:.+}/items/{itemId}/alternar-pago")
     public String alternarPagoItem(@PathVariable String pedidoId, @PathVariable String itemId) {
         Pedido pedido = pedidoRepository.buscarPorId(pedidoId).orElseThrow();
-        pedido.getItems().stream().filter(i -> i.getId().equals(itemId)).findFirst().ifPresent(ItemPedido::alternarPago);
+
+        ItemPedido item = buscarItemPorId(pedido, itemId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No se encontró el item " + itemId + " en el pedido " + pedidoId));
+
+        item.alternarPago();
         pedidoRepository.guardar(pedido);
+
         return "redirect:/pedidos";
     }
 
-    // Ruta fija: /{pedidoId:.+}/items/{itemId}/editar
+    // 2. Editar Item con String itemId
     @PostMapping("/{pedidoId:.+}/items/{itemId}/editar")
     public String editarItem(@PathVariable String pedidoId, @PathVariable String itemId,
                              @RequestParam String nombrePersona, @RequestParam String modeloCamiseta,
@@ -69,18 +76,37 @@ public class PedidoViewController {
                              @RequestParam(required = false) String urlFoto,
                              @RequestParam(value = "tieneNombreNumero", required = false) Boolean tieneNombreNumero,
                              @RequestParam(value = "tieneParches", required = false) Boolean tieneParches) {
-                             
+                           
         Pedido pedido = pedidoRepository.buscarPorId(pedidoId).orElseThrow();
-        pedido.getItems().stream().filter(i -> i.getId().equals(itemId)).findFirst().ifPresent(item -> {
-            item.setNombrePersona(nombrePersona);
-            item.setModeloCamiseta(modeloCamiseta);
-            item.setTalla(talla);
-            item.setTipoCamiseta(tipoCamiseta);
-            item.setUrlFoto(urlFoto);
-            item.setTieneNombreNumero(tieneNombreNumero != null && tieneNombreNumero);
-            item.setTieneParches(tieneParches != null && tieneParches);
-        });
+
+        ItemPedido item = buscarItemPorId(pedido, itemId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No se encontró el item " + itemId + " en el pedido " + pedidoId));
+
+        item.setNombrePersona(nombrePersona);
+        item.setModeloCamiseta(modeloCamiseta);
+        item.setTalla(talla);
+        item.setTipoCamiseta(tipoCamiseta);
+        item.setUrlFoto(urlFoto);
+        item.setTieneNombreNumero(tieneNombreNumero != null && tieneNombreNumero);
+        item.setTieneParches(tieneParches != null && tieneParches);
+
         pedidoRepository.guardar(pedido);
         return "redirect:/pedidos";
+    }
+
+    @PostMapping("/{pedidoId:.+}/finalizar")
+    public String finalizarPedido(@PathVariable String pedidoId) {
+        Pedido pedido = pedidoRepository.buscarPorId(pedidoId).orElseThrow();
+        pedido.setEstado("CERRADO");
+        pedidoRepository.guardar(pedido);
+        return "redirect:/pedidos";
+    }
+
+    private java.util.Optional<ItemPedido> buscarItemPorId(Pedido pedido, String itemId) {
+        String itemIdNormalizado = itemId == null ? "" : itemId.trim();
+        return pedido.getItems().stream()
+                .filter(i -> i.getId() != null && i.getId().trim().equals(itemIdNormalizado))
+                .findFirst();
     }
 }
